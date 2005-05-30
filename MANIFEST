@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+ppport.h
+README
+lib/Senna.pm
+lib/Senna/Index.pm
+lib/Senna/Cursor.pm
+lib/Senna/Result.pm
+Senna.xs
+
+SIGNATURE    Added here by Module::Build

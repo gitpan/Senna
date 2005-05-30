@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name: Senna
+version: 0.02
+author:
+  - |-
+    Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
+  - |-
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.6 or,
+    at your option, any later version of Perl 5 you may have available.
+  - ! >-
+    Development funded by Brazil Ltd.
+    E<lt>http://dev.razil.jp/projects/senna/E<gt>
+abstract: Perl Interrface To Senna Fulltext Search Engine
+license: perl
+provides:
+  Senna:
+    file: lib/Senna.pm
+    version: 0.02
+  Senna::Cursor:
+    file: lib/Senna/Cursor.pm
+    version: 0.01
+  Senna::Index:
+    file: lib/Senna/Index.pm
+    version: 0.02
+  Senna::Result:
+    file: lib/Senna/Result.pm
+generated_by: Module::Build version 0.25

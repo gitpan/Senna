@@ -1,0 +1,18 @@
+Changes
+=======
+
+0.02_02 - 30 May 2005
+   - Start mucking with new API
+   - Add Senna::Index ->remove
+   - Change semantics of Senna::Cursor 
+   - Add Senna::Cursor->hits
+
+0.02_01 - 11 Apr 2005
+   - Apply patch from Hiroyuki Oyama (work with latest senna API)
+   - No longer use Senna::Index->new(). Use open() and create() instead.
+   - Export flags from Senna.pm
+   - TODO: Design API around new Senna API
+   - TODO: More tests, examples
+
+0.01
+  - Initial version

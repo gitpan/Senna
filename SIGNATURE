@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a78e253e4d874c44f1d666879c82e26a0f617a8a Changes
+SHA1 0a6469b0875fe5f548867f16c7c17c0c237d6446 MANIFEST
+SHA1 320f2ea538236c9bd6a4a5d39b1e286b87d13558 META.yml
+SHA1 c0ba25ded2280f8760d4ae067b5e039e813ac197 Makefile.PL
+SHA1 f599c9cdf09244d080ee4d3445770770d68dcbb3 README
+SHA1 bb32200c7bc8c1c4ef74aa11fd8e4dca3c129ac1 Senna.xs
+SHA1 7b9250da3a9f681ecaab02deb6f321bba3e36d00 lib/Senna.pm
+SHA1 12263be8cd724e598d224cdda3b7bdc22f616f1a lib/Senna/Cursor.pm
+SHA1 8ba7d6ad006da96297674ba651129acc990774bd lib/Senna/Index.pm
+SHA1 b6481ab24d839a08e735f2b07f1c2aeb32c160c2 lib/Senna/Result.pm
+SHA1 411cf800e7b10231604f459c7bd367accca5ef5a ppport.h
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: For info see http://www.gnupg.org
+
+iD8DBQFCmvHypIZqybP6lHMRAs7TAKDp8zwqGXUiziTsptDL84lvSBaWJQCgpOyq
+AkDtRI8DdAflHof18dsoKeU=
+=DYSR
+-----END PGP SIGNATURE-----
