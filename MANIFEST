@@ -9,5 +9,3 @@ lib/Senna/Index.pm
 lib/Senna/Cursor.pm
 lib/Senna/Result.pm
 Senna.xs
-
-SIGNATURE    Added here by Module::Build

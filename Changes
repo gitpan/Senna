@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.02_04 - 04 Jun 2005
+   - Fix segfaults when Senna::Cursor has no results
+
+0.02_03 - 31 May 2005
+   - *** Incompatible Change ***
+     Senna::Index->create now takes key_size argument
+   - Add SEN_VARCHAR_KEY, SEN_INT_KEY and SEN_ENC_* constants
+   - Add encoding(), key_size(), initial_n_segments(), and flags()
+     (note that you will need a very recent version of senna)
+
 0.02_02 - 30 May 2005
    - Start mucking with new API
    - Add Senna::Index ->remove
