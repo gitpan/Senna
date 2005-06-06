@@ -3,7 +3,7 @@ name: Senna
 version: 0.02
 author:
   - Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
-abstract: Perl Interrface To Senna Fulltext Search Engine
+abstract: Perl Interface To Senna Fulltext Search Engine
 license: perl
 provides:
   Senna:

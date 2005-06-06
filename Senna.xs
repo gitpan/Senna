@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 16 2005-06-05 01:09:34Z daisuke $ 
+/* $Id: Senna.xs 19 2005-06-05 13:25:14Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -46,6 +46,7 @@ put_varchar(SENNA_INDEX_STATE *state, SV *key, SV *value)
     char *index_key;
     char *index_value;
     STRLEN len;
+    sen_rc rc;
 
     index_key   = SvPV(key, len);
     if (len >= SENNA_MAX_KEY_LEN) {
@@ -53,8 +54,9 @@ put_varchar(SENNA_INDEX_STATE *state, SV *key, SV *value)
     }
     index_value = SvPV(value, len);
 
-    return newSVuv(sen_index_upd(state->index, (const char *) index_key,
-                                       NULL, (const char *) index_value));
+    rc = sen_index_upd(state->index, (const char *) index_key,
+                                       NULL, (const char *) index_value);
+    return (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
 }
 
 static SV *
@@ -63,11 +65,13 @@ put_int(SENNA_INDEX_STATE *state, SV *key, SV *value)
     int index_key;
     char *index_value;
     STRLEN len;
+    sen_rc rc;
 
     index_key   = SvIV(key);
     index_value = SvPV(value, len);
-    return newSVuv(sen_index_upd(state->index, (const int *) index_key,
-                                       NULL, (const char *) index_value));
+    rc = sen_index_upd(state->index, (const int *) index_key,
+                                       NULL, (const char *) index_value);
+    return (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
 }
 
 static SENNA_INDEX_STATE*
@@ -494,7 +498,7 @@ close(self)
         } else {
             sen_index_close(state->index);
             state->index = NULL;
-            RETVAL = newSVuv((uint8_t) 1);
+            RETVAL = &PL_sv_yes;
         }
     OUTPUT:
         RETVAL
@@ -520,7 +524,7 @@ remove(self)
             rc = sen_index_remove((const char *) state->filename);
             state->index = NULL;
             state->filename[0] = '\0';
-            RETVAL = newSVuv((uint8_t) rc == sen_success);
+            RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
         }
     OUTPUT:
         RETVAL
@@ -562,6 +566,7 @@ del(self, key, value)
         char *index_key;
         char *index_value;
         STRLEN len;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -575,7 +580,8 @@ del(self, key, value)
         index_value = SvPV(value, len);
 
         state = get_index_state_hv(self);
-        RETVAL = newSVuv(sen_index_upd(state->index, (const char *) index_key, (const char *) index_value, NULL));
+        rc = sen_index_upd(state->index, (const char *) index_key, (const char *) index_value, NULL);
+        RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
     OUTPUT:
         RETVAL
 
@@ -765,9 +771,9 @@ rewind(self)
         state = get_cursor_state_hv(self);
         if (state && state->cursor) {
             rc = sen_records_rewind(state->cursor);
-            RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_no;
+            RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
         } else {
-            RETVAL = &PL_sv_no;
+            RETVAL = &PL_sv_undef;
         }
     OUTPUT:
         RETVAL
@@ -784,9 +790,9 @@ close(self)
         state = get_cursor_state_hv(self);
         if (state && state->cursor)  {
             rc = sen_records_close(state->cursor);
-            RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_no;
+            RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
         } else {
-            RETVAL = &PL_sv_no;
+            RETVAL = &PL_sv_undef;
         }
     OUTPUT:
         RETVAL
@@ -833,3 +839,5 @@ currkey(self)
         }
     OUTPUT:
         RETVAL
+
+

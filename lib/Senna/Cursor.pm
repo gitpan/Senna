@@ -1,4 +1,4 @@
-# $Id: Cursor.pm 9 2005-05-30 06:43:26Z daisuke $
+# $Id: Cursor.pm 20 2005-06-06 00:53:17Z daisuke $
 #
 # Daisuke Maki <dmak@cpan.org>
 # All rights reserved.
@@ -36,5 +36,19 @@ Senna::Cursor - A Senna Cursor Object
 
   $cursor->rewind();
   $cursor->close();
+
+=head1 AUTHOR
+
+Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/projects/senna/E<gt>
+
+=head1 SEE ALSO
+
+http://dev.razil.jp/projects/senna - Senna Development Homepage
 
 =cut

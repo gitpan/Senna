@@ -1,4 +1,4 @@
-# $Id: Senna.pm 14 2005-05-31 05:00:21Z daisuke $
+# $Id: Senna.pm 20 2005-06-06 00:53:17Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-Senna - Perl Interrface To Senna Fulltext Search Engine
+Senna - Perl Interface To Senna Fulltext Search Engine
 
 =head1 SYNOPSIS
 

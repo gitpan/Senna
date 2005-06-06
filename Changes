@@ -1,8 +1,14 @@
 Changes
 =======
 
+0.02_05 - 06 Jun 2005
+   - Add t/02-morph.t and t/03-ngram.t. Patch by Jun Kuriyama
+   - Revise some return value codes.
+   - Doc tweaks
+
 0.02_04 - 04 Jun 2005
-   - Fix segfaults when Senna::Cursor has no results
+   - Fix segfaults when Senna::Cursor has no results.
+     Reported by Jun Kuriyama
 
 0.02_03 - 31 May 2005
    - *** Incompatible Change ***

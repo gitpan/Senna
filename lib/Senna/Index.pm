@@ -1,4 +1,4 @@
-# $Id: Index.pm 14 2005-05-31 05:00:21Z daisuke $
+# $Id: Index.pm 21 2005-06-06 00:53:50Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -159,15 +159,18 @@ Opens an existing senna index file.
 
 =head2 close
 
-Closes the current senna index file.
+Closes the current senna index files. Returns true on success, false
+otherwise.
 
 =head2 put($key, $value)
 
-Adds a new entry into the senna index file
+Adds a new entry into the senna index file. Returns true on success,
+false otherwise.
 
 =head2 del($key)
 
-Removes an existing entry from the senna index file.
+Removes an existing entry from the senna index file. Returns true on 
+success, false otherwise
 
 =head2 replace($key, $oldval, $newval)
 
@@ -194,6 +197,18 @@ SEN_INDEX_SPLIT_DIGIT, SEN_INDEX_SPLIT_SYMBOL.
 C<:encoding> exports SEN_ENC_DEFAULT, SEN_ENC_NONE, SEN_ENC_EUCJP, SEN_ENC_UTF8,
 SEN_ENC_SJIS.
 
+=head1 AUTHOR
 
+Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/projects/senna/E<gt>
+
+=head1 SEE ALSO
+
+http://dev.razil.jp/projects/senna - Senna Development Homepage
 
 =cut
