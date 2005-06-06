@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 19 2005-06-05 13:25:14Z daisuke $ 
+/* $Id: Senna.xs 23 2005-06-06 06:24:43Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -388,7 +388,10 @@ filename(self)
         }
 
         state = get_index_state_hv(self);
-        RETVAL = newSVpv(state->filename, strlen(state->filename));
+        RETVAL = &PL_sv_undef;
+        if (state && state->filename) {
+            RETVAL = newSVpv(state->filename, strlen(state->filename));
+        }
     OUTPUT:
         RETVAL
 
@@ -399,6 +402,7 @@ key_size(self)
         SV *sv;
         SENNA_INDEX_STATE *state;
         int key_size;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -406,10 +410,12 @@ key_size(self)
         }
 
         state = get_index_state_hv(self);
-        if (sen_success != sen_index_info(state->index, &key_size, NULL, NULL, NULL)) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            RETVAL = newSViv(key_size);
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
+            rc = sen_index_info(state->index, &key_size, NULL, NULL, NULL);
+            if (rc == sen_success) {
+                RETVAL = newSViv(key_size);
+            }
         }
     OUTPUT:
         RETVAL
@@ -421,6 +427,7 @@ flags(self)
         SV *sv;
         SENNA_INDEX_STATE *state;
         int flags;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -428,10 +435,12 @@ flags(self)
         }
 
         state = get_index_state_hv(self);
-        if (sen_success != sen_index_info(state->index, NULL, &flags, NULL, NULL)) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            RETVAL = newSViv(flags);
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
+            rc = sen_index_info(state->index, NULL, &flags, NULL, NULL);
+            if (rc == sen_success) {
+                RETVAL = newSViv(flags);
+            }
         }
     OUTPUT:
         RETVAL
@@ -443,6 +452,7 @@ initial_n_segments(self)
         SV *sv;
         SENNA_INDEX_STATE *state;
         int n_segments;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -450,10 +460,12 @@ initial_n_segments(self)
         }
 
         state = get_index_state_hv(self);
-        if (sen_success != sen_index_info(state->index, NULL, NULL, &n_segments, NULL)) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            RETVAL = newSViv(n_segments);
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
+            rc = sen_index_info(state->index, NULL, NULL, &n_segments, NULL);
+            if (rc == sen_success) {
+                RETVAL = newSViv(n_segments);
+            }
         }
     OUTPUT:
         RETVAL
@@ -465,6 +477,7 @@ encoding(self)
         SV *sv;
         SENNA_INDEX_STATE *state;
         sen_encoding encoding;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -472,10 +485,12 @@ encoding(self)
         }
 
         state = get_index_state_hv(self);
-        if (sen_success != sen_index_info(state->index, NULL, NULL, NULL, &encoding)) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            RETVAL = newSViv(encoding);
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
+            rc = sen_index_info(state->index, NULL, NULL, NULL, &encoding);
+            if (rc == sen_success) {
+                RETVAL = newSViv(encoding);
+            }
         }
     OUTPUT:
         RETVAL
@@ -493,9 +508,8 @@ close(self)
         }
 
         state = get_index_state_hv(self);
-        if (state->index == NULL) {
-            RETVAL = &PL_sv_undef;
-        } else {
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
             sen_index_close(state->index);
             state->index = NULL;
             RETVAL = &PL_sv_yes;
@@ -518,9 +532,8 @@ remove(self)
         }
 
         state = get_index_state_hv(self);
-        if (state->index == NULL) {
-            RETVAL = &PL_sv_undef;
-        } else {
+        RETVAL = &PL_sv_undef;
+        if (state && state->index) {
             rc = sen_index_remove((const char *) state->filename);
             state->index = NULL;
             state->filename[0] = '\0';

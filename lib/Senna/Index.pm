@@ -1,4 +1,4 @@
-# $Id: Index.pm 21 2005-06-06 00:53:50Z daisuke $
+# $Id: Index.pm 22 2005-06-06 06:23:35Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -179,6 +179,11 @@ Replaces the index that $key is pointing to from $oldval to $newval
 =head2 remove()
 
 Removes the index file opened in the current index.
+
+=head2 filename(), keys_size(), flags(), initial_n_segments(), encoding()
+
+Retrieves the index's filename, key_size, flags, initial_n_segments, encoding,
+respectively
 
 =head1 CONSTANTS
 
