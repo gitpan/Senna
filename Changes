@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.04 - 20 Jun 2005
+   - No code change. For some reason the test directory had been wiped
+     from MANIFEST, and therefore it was not included in the distribution
+
 0.03 - 20 Jun 2005
    - Integer keys were not handled properly (I misread the Senna source),
      and it was causing segfaults. This has been fixed.

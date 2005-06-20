@@ -9,3 +9,6 @@ lib/Senna/Index.pm
 lib/Senna/Cursor.pm
 lib/Senna/Result.pm
 Senna.xs
+t/01-sanity.t
+t/02-morph.t
+t/03-ngram.t
