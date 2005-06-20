@@ -1,7 +1,11 @@
 Changes
 =======
 
-0.02 -
+0.03 - 20 Jun 2005
+   - Integer keys were not handled properly (I misread the Senna source),
+     and it was causing segfaults. This has been fixed.
+
+0.02 - 06 Jun 2005
    - Doc tweaks.
    - Check return values.
    - This be 0.02.

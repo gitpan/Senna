@@ -1,4 +1,4 @@
-# $Id: Index.pm 22 2005-06-06 06:23:35Z daisuke $
+# $Id: Index.pm 25 2005-06-20 01:39:16Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -6,7 +6,7 @@
 package Senna::Index;
 use strict;
 use base qw(Exporter);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our(@EXPORT_OK, %EXPORT_TAGS);
 
 our @ISA = qw(Exporter);
@@ -167,14 +167,17 @@ otherwise.
 Adds a new entry into the senna index file. Returns true on success,
 false otherwise.
 
-=head2 del($key)
+=head2 del($key, $value)
 
 Removes an existing entry from the senna index file. Returns true on 
-success, false otherwise
+success, false otherwise. Note that you need to give the previous value of
+the key for the index to correctly recoginize the changes.
 
 =head2 replace($key, $oldval, $newval)
 
-Replaces the index that $key is pointing to from $oldval to $newval
+Replaces the index that $key is pointing to from $oldval to $newval.
+Note that you need to give the previous value of the key for the index to
+correctly recoginize the changes.
 
 =head2 remove()
 

@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 23 2005-06-06 06:24:43Z daisuke $ 
+/* $Id: Senna.xs 25 2005-06-20 01:39:16Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -39,38 +39,31 @@ struct psenna_cursor {
 
 typedef struct psenna_cursor SENNA_CURSOR_STATE;
 
-
-static SV *
-put_varchar(SENNA_INDEX_STATE *state, SV *key, SV *value)
+static void *
+sv2senna_key(SV *key)
 {
-    char *index_key;
-    char *index_value;
+    long *long_key;
+    char *char_key;
     STRLEN len;
-    sen_rc rc;
-
-    index_key   = SvPV(key, len);
-    if (len >= SENNA_MAX_KEY_LEN) {
-        croak("key length must be less than SENNA_MAX_KEY_LEN bytes");
+    if (SvIOK(key)) {
+         long_key = &(SvIVX(key));
+         return long_key;
+    } else {
+        char_key = SvPV(key, len);
+        if (len >= SENNA_MAX_KEY_LEN) {
+            croak("key length must be less than SENNA_MAX_KEY_LEN bytes");
+        }
+        return char_key;
     }
-    index_value = SvPV(value, len);
-
-    rc = sen_index_upd(state->index, (const char *) index_key,
-                                       NULL, (const char *) index_value);
-    return (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
 }
 
 static SV *
-put_int(SENNA_INDEX_STATE *state, SV *key, SV *value)
+put(SENNA_INDEX_STATE *state, void *key, char *value)
 {
-    int index_key;
-    char *index_value;
-    STRLEN len;
     sen_rc rc;
 
-    index_key   = SvIV(key);
-    index_value = SvPV(value, len);
-    rc = sen_index_upd(state->index, (const int *) index_key,
-                                       NULL, (const char *) index_value);
+    rc = sen_index_upd(state->index, (const void *)key,
+                                       NULL, (const char *) value);
     return (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
 }
 
@@ -550,9 +543,10 @@ put(self, key, value)
     PREINIT:
         SV *sv;
         SENNA_INDEX_STATE *state;
-        char *index_key;
+        void *index_key;
         char *index_value;
         STRLEN len;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -560,11 +554,11 @@ put(self, key, value)
         }
 
         state = get_index_state_hv(self);
-        if (SvIOK(key)) {
-            RETVAL = put_int(state, key, value);
-        } else {
-            RETVAL = put_varchar(state, key, value);
-        }
+        index_key   = sv2senna_key(key);
+        index_value = SvPV_nolen(value);
+        rc = sen_index_upd(state->index, (const void *) index_key,
+                                       NULL, (const char *) index_value);
+        RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
     OUTPUT:
         RETVAL
 
@@ -576,7 +570,7 @@ del(self, key, value)
     PREINIT:
         SV *sv;
         SENNA_INDEX_STATE *state;
-        char *index_key;
+        void *index_key;
         char *index_value;
         STRLEN len;
         sen_rc rc;
@@ -586,14 +580,12 @@ del(self, key, value)
             croak("Not a reference to a hash");
         }
 
-        index_key   = SvPV(key, len);
-        if (len >= SENNA_MAX_KEY_LEN) {
-            croak("key length must be less than SENNA_MAX_KEY_LEN bytes");
-        }
+        index_key   = sv2senna_key(key);
         index_value = SvPV(value, len);
 
         state = get_index_state_hv(self);
-        rc = sen_index_upd(state->index, (const char *) index_key, (const char *) index_value, NULL);
+        rc = sen_index_upd(state->index, (const void *) index_key,
+                                        (const char *) index_value, NULL);
         RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
     OUTPUT:
         RETVAL
@@ -617,15 +609,12 @@ replace(self, key, old, new)
             croak("Not a reference to a hash");
         }
 
-        key_value = SvPV(key, len);
-        if (len >= SENNA_MAX_KEY_LEN) {
-            croak("key length must be less than SENNA_MAX_KEY_LEN bytes");
-        }
+        key_value = sv2senna_key(key);
         old_value = SvPV(old, len);
         new_value = SvPV(new, len);
 
         state = get_index_state_hv(self);
-        RETVAL = newSVuv(sen_index_upd(state->index, (const char *) key_value,
+        RETVAL = newSVuv(sen_index_upd(state->index, (const void *) key_value,
                        (const char*) old_value, (const char *) new_value));
     OUTPUT:
         RETVAL
