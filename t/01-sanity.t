@@ -6,7 +6,7 @@
 # All rights reserved.
 
 use strict;
-use Test::More (tests => 31);
+use Test::More (tests => 39);
 use File::Spec;
 
 BEGIN
@@ -26,17 +26,20 @@ ok(SEN_ENC_EUCJP);
 ok(SEN_ENC_UTF8);
 ok(SEN_ENC_SJIS);
 
+is(SEN_VARCHAR_KEY, 0);
+ok(SEN_INT_KEY);
+
 my $index_name = 'test.db';
 my $path       = File::Spec->catfile('t', $index_name);
 my $index      = Senna::Index->create($path);
+my $c;
 
 is($index->key_size, 0);
 is($index->encoding, SEN_ENC_EUCJP);
 
 $index->put("日本語", "日本語とかで色々書きますと");
 
-my $c = $index->search("日本語");
-ok($c);
+ok($c = $index->search("日本語"));
 isa_ok($c, 'Senna::Cursor');
 is($c->hits, 1);
 
@@ -45,25 +48,31 @@ isa_ok($r, 'Senna::Result');
 ok($c->rewind);
 
 # now check when there are no hits
-$c = $index->search("これは当たりません");
-ok($c);
+ok($c = $index->search("これは当たりません"));
 isa_ok($c, 'Senna::Cursor');
 is($c->hits, 0);
 ok(! $c->next);
 ok(! $c->rewind);
 
-$index->del("日本語", "日本語とかで色々書きますと");
-$c = $index->search("日本語");
-ok($c);
+ok($index->del("日本語", "日本語とかで色々書きますと"));
+ok($c = $index->search("日本語"));
 isa_ok($c, 'Senna::Cursor');
 is($c->hits, 0);
 
+ok($index->remove());
+
 # Now check for integer keys
+$index = Senna::Index->create($path, SEN_INT_KEY);
 $index->put(1, "数値型のキー");
-$c = $index->search("数値型");
-ok($c);
+ok($c = $index->search("数値型"));
 isa_ok($c, 'Senna::Cursor');
 is($c->hits, 1);
 ok($index->del(1, "数値型のキー"));
+
+ok(!eval { $index->put("文字列", "数値型のキーのはず") });
+
+ok($index->replace(1, "数値型のキー", "数値型のキーを新しくしてみる"));
+ok($c = $index->search("新しく"));
+is($c->hits, 1);
 
 ok($index->remove());

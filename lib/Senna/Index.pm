@@ -1,4 +1,4 @@
-# $Id: Index.pm 25 2005-06-20 01:39:16Z daisuke $
+# $Id: Index.pm 28 2005-06-20 02:37:08Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -123,7 +123,10 @@ supports
   SEN_VARCHAR_KEY
   SEN_INT_KEY
 
-default is SEN_VARCHAR_KEY.
+default is SEN_VARCHAR_KEY. Once you create an index with one, you must keep
+supplying that type for the key. The default VARCHAR key will actually allow
+you to specify any type of strigify-able variable as the key, but if generally
+INT keys are slightlly faster.
 
 $flags is a bit mask, which can be a combination of 
 

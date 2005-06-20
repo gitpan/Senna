@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 25 2005-06-20 01:39:16Z daisuke $ 
+/* $Id: Senna.xs 28 2005-06-20 02:37:08Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -40,14 +40,20 @@ struct psenna_cursor {
 typedef struct psenna_cursor SENNA_CURSOR_STATE;
 
 static void *
-sv2senna_key(SV *key)
+sv2senna_key(SENNA_INDEX_STATE *state, SV *key)
 {
-    long *long_key;
+    long *int_key;
     char *char_key;
     STRLEN len;
-    if (SvIOK(key)) {
-         long_key = &(SvIVX(key));
-         return long_key;
+
+    /* key_size determines the type of key */
+    if (state->key_size == SEN_INT_KEY) {
+        if (! SvIOK(key)) {
+            croak("index is created with integer keys, but was passed a non-integer key");
+        }
+
+        int_key = &(SvIVX(key));
+        return int_key;
     } else {
         char_key = SvPV(key, len);
         if (len >= SENNA_MAX_KEY_LEN) {
@@ -315,6 +321,7 @@ _create(self, path, key_size = SEN_VARCHAR_KEY, flags = NULL, n_segment = NULL, 
 
         state->index    = sen_index_create(index_path, index_key_size, index_flags,
                                             index_n_segment, index_encoding);
+        state->key_size  = index_key_size;
         strcpy(state->filename, index_path);
         if (state->index) {
             RETVAL = &PL_sv_yes;
@@ -554,7 +561,7 @@ put(self, key, value)
         }
 
         state = get_index_state_hv(self);
-        index_key   = sv2senna_key(key);
+        index_key   = sv2senna_key(state, key);
         index_value = SvPV_nolen(value);
         rc = sen_index_upd(state->index, (const void *) index_key,
                                        NULL, (const char *) index_value);
@@ -580,10 +587,9 @@ del(self, key, value)
             croak("Not a reference to a hash");
         }
 
-        index_key   = sv2senna_key(key);
-        index_value = SvPV(value, len);
-
         state = get_index_state_hv(self);
+        index_key   = sv2senna_key(state, key);
+        index_value = SvPV(value, len);
         rc = sen_index_upd(state->index, (const void *) index_key,
                                         (const char *) index_value, NULL);
         RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
@@ -603,19 +609,20 @@ replace(self, key, old, new)
         char *key_value;
         char *old_value;
         char *new_value;
+        sen_rc rc;
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
             croak("Not a reference to a hash");
         }
 
-        key_value = sv2senna_key(key);
+        state = get_index_state_hv(self);
+        key_value = sv2senna_key(state, key);
         old_value = SvPV(old, len);
         new_value = SvPV(new, len);
-
-        state = get_index_state_hv(self);
-        RETVAL = newSVuv(sen_index_upd(state->index, (const void *) key_value,
-                       (const char*) old_value, (const char *) new_value));
+        rc = sen_index_upd(state->index, (const void *) key_value,
+                       (const char*) old_value, (const char *) new_value);
+        RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
     OUTPUT:
         RETVAL
 
@@ -718,7 +725,7 @@ next(self)
     PREINIT:
         SV *sv;
         STRLEN len;
-        char *next;
+        void *next;
         SENNA_CURSOR_STATE *state;
     CODE:
         dSP;
@@ -727,14 +734,21 @@ next(self)
 
         state = get_cursor_state_hv(self);
         if (state && state->cursor) {
-            if (next = (char *) sen_records_next(state->cursor)) {
-                /* Create a result object */
+            if (next = (void *) sen_records_next(state->cursor)) {
                 ENTER;
                 SAVETMPS;
                 PUSHMARK(SP);
                 XPUSHs(sv_2mortal(newSVpv("Senna::Result", 13)));
                 XPUSHs(sv_2mortal(newSVpv("key", 3)));
-                XPUSHs(sv_2mortal(newSVpv(next, strlen(next))));
+
+                /* depending on what type of key the index contains, we need
+                 * to change the SV created here
+                 */
+                if (state->key_size == SEN_INT_KEY) {
+                    XPUSHs(sv_2mortal(newSViv(*((int *)next))));
+                } else {
+                    XPUSHs(sv_2mortal(newSVpv((char *) next, strlen((char *) next))));
+                }
                 XPUSHs(sv_2mortal(newSVpv("score", 5)));
                 XPUSHs(sv_2mortal(newSVuv(sen_records_curr_score(state->cursor))));
                 PUTBACK;

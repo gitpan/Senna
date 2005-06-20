@@ -1,4 +1,4 @@
-# $Id: Senna.pm 26 2005-06-20 01:54:43Z daisuke $
+# $Id: Senna.pm 28 2005-06-20 02:37:08Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -6,7 +6,7 @@
 package Senna;
 use 5.006001;
 use strict;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Senna', $VERSION);
