@@ -6,7 +6,7 @@
 # All rights reserved.
 
 use strict;
-use Test::More (tests => 39);
+use Test::More (tests => 40);
 use File::Spec;
 
 BEGIN
@@ -42,6 +42,8 @@ $index->put("日本語", "日本語とかで色々書きますと");
 ok($c = $index->search("日本語"));
 isa_ok($c, 'Senna::Cursor');
 is($c->hits, 1);
+my @list = $c->as_list;
+is(scalar(@list), 1);
 
 my $r = $c->next;
 isa_ok($r, 'Senna::Result');

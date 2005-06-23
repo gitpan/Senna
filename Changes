@@ -1,7 +1,15 @@
 Changes
 =======
 
-0.05 - 20 Jun 2005A
+0.06 - 23 Jun 2005
+   - Require senna that has senna-cfg. This will make life much easier for
+     people reporting errors and such. (As of this writing, it requires
+     the latest senna release from subversion)
+   - Change Makefile.PL accordingly
+   - add Senna::Cursor->as_list()
+   - Senna::Index and Senna::Cursor was leaking memory. Fixed.
+
+0.05 - 20 Jun 2005
    - Integer keys fix again. This time check at the cursor level, too
    - Fix the return value from replace()
 

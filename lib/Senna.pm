@@ -1,4 +1,4 @@
-# $Id: Senna.pm 28 2005-06-20 02:37:08Z daisuke $
+# $Id: Senna.pm 30 2005-06-23 02:23:48Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -6,7 +6,7 @@
 package Senna;
 use 5.006001;
 use strict;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Senna', $VERSION);
@@ -45,10 +45,10 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/projects/senna/E<gt>
+Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
 
 =head1 SEE ALSO
 
-http://dev.razil.jp/projects/senna - Senna Development Homepage
+http://dev.razil.jp/project/senna - Senna Development Homepage
 
 =cut

@@ -1,4 +1,4 @@
-# $Id: Cursor.pm 20 2005-06-06 00:53:17Z daisuke $
+# $Id: Cursor.pm 30 2005-06-23 02:23:48Z daisuke $
 #
 # Daisuke Maki <dmak@cpan.org>
 # All rights reserved.
@@ -15,6 +15,12 @@ sub new
     my $self  = bless {}, $class;
     $self->_alloc_cursor_state();
     return $self;
+}
+
+sub as_list
+{
+    my $self = shift;
+    return wantarray ? @{$self->_as_list} : $self->_as_list;
 }
 
 __END__
@@ -45,10 +51,10 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
 at your option, any later version of Perl 5 you may have available.
 
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/projects/senna/E<gt>
+Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
 
 =head1 SEE ALSO
 
-http://dev.razil.jp/projects/senna - Senna Development Homepage
+http://dev.razil.jp/project/senna - Senna Development Homepage
 
 =cut
