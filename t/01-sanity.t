@@ -1,6 +1,6 @@
 #!perl
 #
-# $Id$
+# $Id: 01-sanity.t 32 2005-06-24 00:38:36Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.

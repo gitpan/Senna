@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.07 - 29 Jun 2005
+   - Fix calling get_*_state_hv() so that it uses aTHX_ properly.
+     Pointed out by Lyo Kato
+
 0.06 - 23 Jun 2005
    - Require senna that has senna-cfg. This will make life much easier for
      people reporting errors and such. (As of this writing, it requires

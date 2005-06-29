@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 30 2005-06-23 02:23:48Z daisuke $ 
+/* $Id: Senna.xs 31 2005-06-24 00:35:04Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -294,7 +294,7 @@ _create(self, path, key_size = SEN_VARCHAR_KEY, flags = NULL, n_segment = NULL, 
         uint8_t      index_flags;
         sen_encoding index_encoding;
         SV          *sv;
-        SENNA_INDEX_STATE *state = get_index_state_hv(self);
+        SENNA_INDEX_STATE *state = get_index_state_hv(aTHX_ self);
     CODE:
         sv = SvRV(self);
         if (!sv || SvTYPE(sv) != SVt_PVHV) {
@@ -336,7 +336,7 @@ _open(self, path, ...)
         char        *index_path;
         int          key_size;
         SV          *sv;
-        SENNA_INDEX_STATE *state = get_index_state_hv(self);
+        SENNA_INDEX_STATE *state = get_index_state_hv(aTHX_ self);
     CODE:
         dSP;
 
@@ -384,7 +384,7 @@ filename(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->filename) {
             RETVAL = newSVpv(state->filename, strlen(state->filename));
@@ -406,7 +406,7 @@ key_size(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             rc = sen_index_info(state->index, &key_size, NULL, NULL, NULL);
@@ -431,7 +431,7 @@ flags(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             rc = sen_index_info(state->index, NULL, &flags, NULL, NULL);
@@ -456,7 +456,7 @@ initial_n_segments(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             rc = sen_index_info(state->index, NULL, NULL, &n_segments, NULL);
@@ -481,7 +481,7 @@ encoding(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             rc = sen_index_info(state->index, NULL, NULL, NULL, &encoding);
@@ -504,7 +504,7 @@ close(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             sen_index_close(state->index);
@@ -528,7 +528,7 @@ remove(self)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         RETVAL = &PL_sv_undef;
         if (state && state->index) {
             rc = sen_index_remove((const char *) state->filename);
@@ -557,7 +557,7 @@ put(self, key, value)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         index_key   = sv2senna_key(state, key);
         index_value = SvPV_nolen(value);
         rc = sen_index_upd(state->index, (const void *) index_key,
@@ -584,7 +584,7 @@ del(self, key, value)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         index_key   = sv2senna_key(state, key);
         index_value = SvPV(value, len);
         rc = sen_index_upd(state->index, (const void *) index_key,
@@ -613,7 +613,7 @@ replace(self, key, old, new)
             croak("Not a reference to a hash");
         }
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         key_value = sv2senna_key(state, key);
         old_value = SvPV(old, len);
         new_value = SvPV(new, len);
@@ -639,7 +639,7 @@ search(self, query)
     CODE:
         dSP;
 
-        state = get_index_state_hv(self);
+        state = get_index_state_hv(aTHX_ self);
         index_query = SvPV(query, len);
         result = sen_index_sel(state->index, index_query);
 
@@ -675,7 +675,7 @@ void
 DESTROY(self)
         SV *self;
     PREINIT:
-        SENNA_CURSOR_STATE *state = get_cursor_state_hv(self);
+        SENNA_CURSOR_STATE *state = get_cursor_state_hv(aTHX_ self);
     CODE:
         Safefree(state);
 
@@ -723,7 +723,7 @@ _as_list(self)
     CODE:
         dSP;
 
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         list = newAV();
         if (state && state->cursor) {
             /* Remember current location, so that we can rewind the cursor
@@ -782,7 +782,7 @@ hits(self)
     PREINIT:
         SENNA_CURSOR_STATE *state;
     CODE:
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor)
             RETVAL = newSVuv(sen_records_nhits(state->cursor));
         else
@@ -803,7 +803,7 @@ next(self)
 
         RETVAL = &PL_sv_undef;
 
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor) {
             if (next = (void *) sen_records_next(state->cursor)) {
                 ENTER;
@@ -853,7 +853,7 @@ rewind(self)
     CODE:
         RETVAL = &PL_sv_undef;
 
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor) {
             rc = sen_records_rewind(state->cursor);
             RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
@@ -870,7 +870,7 @@ close(self)
     CODE:
         RETVAL = &PL_sv_undef;
 
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor)  {
             rc = sen_records_close(state->cursor);
             RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
@@ -885,7 +885,7 @@ score(self)
         SENNA_CURSOR_STATE *state;
     CODE:
         RETVAL = &PL_sv_undef;
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor) {
             RETVAL = newSVuv(sen_records_curr_score(state->cursor));
         }
@@ -901,7 +901,7 @@ currkey(self)
         SENNA_CURSOR_STATE *state;
     CODE:
         RETVAL = &PL_sv_undef;
-        state = get_cursor_state_hv(self);
+        state = get_cursor_state_hv(aTHX_ self);
         if (state && state->cursor) {
             if (state->key_size == SEN_INT_KEY) {
                 int_key = (int *) sen_records_curr_key(state->cursor);
@@ -922,7 +922,7 @@ void
 DESTROY(self)
         SV *self;
     PREINIT:
-        SENNA_INDEX_STATE *state = get_index_state_hv(self);
+        SENNA_INDEX_STATE *state = get_index_state_hv(aTHX_ self);
     CODE:
         Safefree(state);
 

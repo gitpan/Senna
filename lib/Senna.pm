@@ -6,7 +6,7 @@
 package Senna;
 use 5.006001;
 use strict;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Senna', $VERSION);

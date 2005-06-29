@@ -1,6 +1,6 @@
 #!perl
 #
-# $Id$
+# $Id: 02-morph.t 32 2005-06-24 00:38:36Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
