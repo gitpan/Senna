@@ -1,6 +1,17 @@
 Changes
 =======
 
+0.07_01 - 02 Aug 2005
+   - Fix rt #133933. This was caused by a hoopla between the senna
+     developer and myself wrt the understanding of sen_index_info().
+     This release works, but I wish to change it back to something saner,
+     if libsenna can be fixed.
+   - Change object from hash based to scalar based
+   - Remove redundunt calls from Perl to XS
+   - Add more error checks. Things will croak more now.
+   - Add Build.PL, because I want Senna.pm to display a proper
+     license when uploaded to CPAN.
+
 0.07 - 29 Jun 2005
    - Fix calling get_*_state_hv() so that it uses aTHX_ properly.
      Pointed out by Lyo Kato

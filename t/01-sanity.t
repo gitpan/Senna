@@ -1,12 +1,12 @@
 #!perl
 #
-# $Id: 01-sanity.t 32 2005-06-24 00:38:36Z daisuke $
+# $Id: 01-sanity.t 35 2005-07-25 02:02:35Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 use strict;
-use Test::More (tests => 40);
+use Test::More (tests => 41);
 use File::Spec;
 
 BEGIN
@@ -39,14 +39,15 @@ is($index->encoding, SEN_ENC_EUCJP);
 
 $index->put("日本語", "日本語とかで色々書きますと");
 
-ok($c = $index->search("日本語"));
+ok($c = $index->search("日本語"), "test search");
 isa_ok($c, 'Senna::Cursor');
-is($c->hits, 1);
+is($c->hits, 1, "should hit only 1 result");
 my @list = $c->as_list;
-is(scalar(@list), 1);
+is(scalar(@list), 1, "test as_list");
 
 my $r = $c->next;
 isa_ok($r, 'Senna::Result');
+is($r->key, $list[0]->key, "make sure next() returns the same thing as as_list()");
 ok($c->rewind);
 
 # now check when there are no hits

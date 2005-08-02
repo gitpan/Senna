@@ -1,4 +1,4 @@
-# $Id: Cursor.pm 30 2005-06-23 02:23:48Z daisuke $
+# $Id: Cursor.pm 35 2005-07-25 02:02:35Z daisuke $
 #
 # Daisuke Maki <dmak@cpan.org>
 # All rights reserved.
@@ -8,20 +8,6 @@ use strict;
 use Senna::Result;
 use vars qw($VERSION);
 $VERSION = '0.01';
-
-sub new
-{
-    my $class = shift;
-    my $self  = bless {}, $class;
-    $self->_alloc_cursor_state();
-    return $self;
-}
-
-sub as_list
-{
-    my $self = shift;
-    return wantarray ? @{$self->_as_list} : $self->_as_list;
-}
 
 __END__
 

@@ -1,17 +1,24 @@
-# $Id: Senna.pm 30 2005-06-23 02:23:48Z daisuke $
+# $Id: Senna.pm 37 2005-08-02 12:04:23Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 package Senna;
-use 5.006001;
 use strict;
-our $VERSION = '0.07';
+use vars qw($VERSION);
 
-require XSLoader;
-XSLoader::load('Senna', $VERSION);
-
-Senna::sen_init();
+BEGIN
+{
+    $VERSION = '0.07';
+    if ($] > 5.006) {
+        require XSLoader;
+        XSLoader::load('Senna', $VERSION);
+    } else {
+        require DynaLoader;
+        @Senna::ISA = ('DynaLoader');
+        __PACKAGE__->bootstrap();
+    }
+}
 
 use Senna::Index;
 use Senna::Cursor;

@@ -1,4 +1,4 @@
-# $Id: Index.pm 29 2005-06-20 05:33:45Z daisuke $
+# $Id: Index.pm 35 2005-07-25 02:02:35Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -41,37 +41,6 @@ BEGIN
 }
 use Senna;
 use Senna::Cursor;
-
-sub _new
-{
-    my $class = shift;
-
-    my $self  = bless {}, $class;
-    $self->_alloc_senna_state();
-    return $self;
-}
-
-sub create
-{
-    my $class = shift;
-    my $obj   = $class->_new();
-    if ($obj->_create(@_)) {
-        return $obj;
-    } else {
-        return undef;
-    }
-}
-
-sub open
-{
-    my $class = shift;
-    my $obj   = $class->_new();
-    if ($obj->_open(@_)) {
-        return $obj;
-    } else {
-        return undef;
-    }
-}
 
 __END__
 

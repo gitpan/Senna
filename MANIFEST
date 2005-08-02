@@ -1,4 +1,5 @@
 Changes
+Build.PL
 Makefile.PL
 MANIFEST
 META.yml
@@ -12,3 +13,4 @@ Senna.xs
 t/01-sanity.t
 t/02-morph.t
 t/03-ngram.t
+check_version.pl
