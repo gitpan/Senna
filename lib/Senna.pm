@@ -1,4 +1,4 @@
-# $Id: Senna.pm 37 2005-08-02 12:04:23Z daisuke $
+# $Id: Senna.pm 39 2005-08-05 04:28:19Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -9,7 +9,7 @@ use vars qw($VERSION);
 
 BEGIN
 {
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load('Senna', $VERSION);

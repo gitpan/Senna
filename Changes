@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.08 - 05 Aug 2005
+   - Further tweak on Build.PL / Makefile.PL.
+
+0.07_02 - 03 Aug @005
+   - Fix del(): mixup in the order of execution. 
+   - I don't know what this is, but M::B chokes on second attempt to
+     build the XS code if lib/Senna.c exists. work around it.
+
 0.07_01 - 02 Aug 2005
    - Fix rt #133933. This was caused by a hoopla between the senna
      developer and myself wrt the understanding of sen_index_info().

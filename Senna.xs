@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 37 2005-08-02 12:04:23Z daisuke $ 
+/* $Id: Senna.xs 38 2005-08-05 04:27:58Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -436,10 +436,10 @@ del(self, key, value)
         STRLEN len;
         sen_rc rc;
     CODE:
+        state = XS_STATE(SENNA_INDEX_STATE *, self);
         if (! SEN_INDEX_OK(state))
             croak("No index associated with Senna::Index");
 
-        state = XS_STATE(SENNA_INDEX_STATE *, self);
         index_key   = sv2senna_key(state, key);
         index_value = SvPV(value, len);
         rc = sen_index_upd(state->index, (const void *) index_key,
