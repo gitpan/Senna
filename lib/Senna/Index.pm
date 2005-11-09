@@ -160,6 +160,14 @@ Removes the index file opened in the current index.
 Retrieves the index's filename, key_size, flags, initial_n_segments, encoding,
 respectively
 
+=head2 key_size()
+
+Returns the interger size of the underlying senna index.
+
+=head2 search($query)
+
+Performs a fulltext search on the opened index. Returns a Senna::Cursor
+
 =head1 CONSTANTS
 
 Constants can are available by importing them:

@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.09 - 09 Nov 2005
+   - Add POD tests
+   - Add new docs
+
 0.08 - 05 Aug 2005
    - Further tweak on Build.PL / Makefile.PL.
 

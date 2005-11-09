@@ -142,17 +142,7 @@ bootinit()
     newCONSTSUB(stash, "SEN_ENC_SJIS", newSViv(sen_enc_sjis));
 }
 
-MODULE = Senna      PACKAGE = Senna
-
-PROTOTYPES: ENABLE
-
-BOOT:
-    bootinit();
-
-MODULE = Senna		PACKAGE = Senna::Index		
-
-PROTOTYPES: ENABLE
-
+#if 0
 SV *
 new(class)
         SV *class
@@ -165,7 +155,18 @@ new(class)
         RETVAL = sv;
     OUTPUT:
         RETVAL
+#endif
 
+MODULE = Senna      PACKAGE = Senna
+
+PROTOTYPES: ENABLE
+
+BOOT:
+    bootinit();
+
+MODULE = Senna		PACKAGE = Senna::Index		
+
+PROTOTYPES: ENABLE
 
 SV *
 create(class, path, key_size = SEN_VARCHAR_KEY, flags = NULL, n_segment = NULL, encoding = sen_enc_default)

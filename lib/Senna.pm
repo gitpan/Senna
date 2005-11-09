@@ -9,7 +9,7 @@ use vars qw($VERSION);
 
 BEGIN
 {
-    $VERSION = '0.08';
+    $VERSION = '0.09';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load('Senna', $VERSION);

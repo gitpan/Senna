@@ -29,6 +29,40 @@ Senna::Cursor - A Senna Cursor Object
   $cursor->rewind();
   $cursor->close();
 
+=head1 METHODS
+
+=head2 as_list()
+
+Returns the list of Senna::Result objects in the cursor.
+
+=head2 close()
+
+Closes the the cursor
+
+=head2 currkey()
+
+Returns the key of the current result object pointed by the cursor.
+
+=head2 hits()
+
+Returns the number of hits in the cursor.
+
+=head2 new()
+
+Creates a new cursor. Users shouldn't really need to worry about this method
+
+=head2 next()
+
+Returns the next Senna::Result object.
+
+=head2 rewind()
+
+Moves the cursor to point the first result.
+
+=head2 score()
+
+Returns the score of the current result object pointed by the cursor.
+
 =head1 AUTHOR
 
 Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
