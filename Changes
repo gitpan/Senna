@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.10 - 15 Nov 2005
+   - Only run POD tests for disttest
+   - Require minimum version 0.3.0 for libsenna, due to some API changes
+   - t/01-sanity.t failed due to the fact that new libsenna made some 
+     enhancements in the checks in the underlying mechanism
+   - t/02-morph.t failed due to the fact that new libsenna does a more
+     wide search in sen_index_sel()
+
 0.09 - 09 Nov 2005
    - Add POD tests
    - Add new docs

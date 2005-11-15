@@ -1,5 +1,5 @@
 #!perl
-# $Id: check_version.pl 36 2005-08-02 11:16:47Z daisuke $
+# $Id: check_version.pl 40 2005-11-15 09:14:44Z daisuke $
 #
 # Copyright (c) 2005 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -36,8 +36,8 @@ while ($_ = shift) {
 }
 
 my %config;
-my @BLACKLIST = (
-    [0,0,0]
+my @BLACKLIST =(
+    [0,3,0,1]
 );
 
 my $DEBUG = delete $MyArgs{DEBUG};
@@ -73,7 +73,7 @@ if ($@) {
     Senna may fail to build ro some tests may not pass.
         EOMSG
     }
-
+}
     if (! defined $config{LIBS} && ! defined $config{INC}) {
         $config{LIBS} = [ qw(-L/usr/local/lib -L/usr/lib -lsenna) ];
         $config{INC}  = [ qw(-I/usr/local/include -I/usr/include) ];
@@ -84,7 +84,6 @@ if ($@) {
         "If this is wrong, Re-run as:\n" .
         "  \$ $^X Makefile.PL LIBS='-L/path/to/lib -lsenna' INC='-I/path/to/include'"
     }
-}
 
 
 # Things below here are ripped right out of XML::LibXML Makefile.PL
@@ -130,15 +129,19 @@ sub try_libconfig {
         my ( $major, $minor, $point) = $ver =~ /(\d+).(\d+)\.(\d+)/g;
         foreach ( @bl ) {
             $state = $_->[3];
-            last if $major <  $_->[0];
-            next if $major >  $_->[0];
-            last if $minor <  $_->[1];
-            next if $minor >  $_->[1];
-            last if $point <= $_->[2];
-            $state = undef;
+            if ($major == 0 && $minor <= 2) {
+                $state = 0;
+            } else {
+                last if $major <  $_->[0];
+                next if $major >  $_->[0];
+                last if $minor <  $_->[1];
+                next if $minor >  $_->[1];
+                last if $point <= $_->[2];
+                $state = undef;
+            }
         }
         if ( defined $state and $state == 0 ) {
-            print "failed\n";
+            print "Unsupported version (senna VERION=$ver). Minimum required is 0.3.0.\n";
             die "VERSION $ver";
         }
 

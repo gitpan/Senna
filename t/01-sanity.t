@@ -1,12 +1,12 @@
 #!perl
 #
-# $Id: 01-sanity.t 35 2005-07-25 02:02:35Z daisuke $
+# $Id: 01-sanity.t 40 2005-11-15 09:14:44Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 use strict;
-use Test::More (tests => 41);
+use Test::More (tests => 46);
 use File::Spec;
 
 BEGIN
@@ -65,17 +65,23 @@ is($c->hits, 0);
 ok($index->remove());
 
 # Now check for integer keys
-$index = Senna::Index->create($path, SEN_INT_KEY);
-$index->put(1, "数値型のキー");
-ok($c = $index->search("数値型"));
-isa_ok($c, 'Senna::Cursor');
-is($c->hits, 1);
-ok($index->del(1, "数値型のキー"));
-
-ok(!eval { $index->put("文字列", "数値型のキーのはず") });
-
-ok($index->replace(1, "数値型のキー", "数値型のキーを新しくしてみる"));
-ok($c = $index->search("新しく"));
-is($c->hits, 1);
-
-ok($index->remove());
+{
+    ok($index = Senna::Index->create($path, SEN_INT_KEY));
+    ok($index->put(1, "数値型のキー"));
+    ok($c = $index->search("数値型"));
+    isa_ok($c, 'Senna::Cursor');
+    is($c->hits, 1);
+    ok($index->del(1, "数値型のキー"));
+    ok($c = $index->search("数値型"));
+    is($c->hits, 0);
+    
+    # Bad key type
+    ok(!eval { $index->put("文字列", "数値型のキーのはず") });
+    
+    ok($index->put(2, "数値型のキー"));
+    ok($index->replace(2, "数値型のキー", "数値型のキーを新しくしてみる"));
+    ok($c = $index->search("新しくしてみる"));
+    is($c->hits, 1);
+    
+    ok($index->remove());
+}

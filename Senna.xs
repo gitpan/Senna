@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 38 2005-08-05 04:27:58Z daisuke $ 
+/* $Id: Senna.xs 40 2005-11-15 09:14:44Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -16,7 +16,7 @@
 #include <senna/senna.h>
 
 #define MAX_INDEX_PATH_LEN 512
-#define SENNA_MAX_KEY_LEN 8024
+#define SENNA_MAX_KEY_LEN 8192
 #define SEN_VARCHAR_KEY 0
 #define SEN_INT_KEY     4
 
@@ -71,6 +71,7 @@ static void *
 sv2senna_key(SENNA_INDEX_STATE *state, SV *key)
 {
     long *int_key;
+    long  int_tmp;
     char *char_key;
     STRLEN len;
 
@@ -80,7 +81,8 @@ sv2senna_key(SENNA_INDEX_STATE *state, SV *key)
             croak("index is created with integer keys, but was passed a non-integer key");
         }
 
-        int_key = &(SvIVX(key));
+        int_tmp = SvIVX(key);
+        int_key = &int_tmp;
         return int_key;
     } else {
         char_key = SvPV(key, len);
@@ -141,21 +143,6 @@ bootinit()
     newCONSTSUB(stash, "SEN_ENC_UTF8", newSViv(sen_enc_utf8));
     newCONSTSUB(stash, "SEN_ENC_SJIS", newSViv(sen_enc_sjis));
 }
-
-#if 0
-SV *
-new(class)
-        SV *class
-    PREINIT:
-        allocSENNA_ARGS;
-    CODE:
-        allocSENNA;
-        SvREADONLY_on(sv);
-
-        RETVAL = sv;
-    OUTPUT:
-        RETVAL
-#endif
 
 MODULE = Senna      PACKAGE = Senna
 
@@ -459,7 +446,7 @@ replace(self, key, old, new)
         SV *sv;
         SENNA_INDEX_STATE *state;
         STRLEN len;
-        char *key_value;
+        void *key_value;
         char *old_value;
         char *new_value;
         sen_rc rc;
@@ -469,8 +456,10 @@ replace(self, key, old, new)
             croak("No index associated with Senna::Index");
 
         key_value = sv2senna_key(state, key);
+
         old_value = SvPV(old, len);
         new_value = SvPV(new, len);
+
         rc = sen_index_upd(state->index, (const void *) key_value,
                        (const char*) old_value, (const char *) new_value);
         RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
@@ -573,11 +562,12 @@ as_list(self)
         SV *self;
     PREINIT:
         SENNA_CURSOR_STATE *state;
-        void *next;
-        AV *list;
-        SV *sv;
+        void *key;
+        int   score;
+        AV   *list;
+        SV   *sv;
         void *oldkey;
-        int idx;
+        int   idx;
     PPCODE:
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
@@ -588,10 +578,13 @@ as_list(self)
         /* Remember current location, so that we can rewind the cursor
          * back to where it was before as_list() was called
          */
-        oldkey = (void *) sen_records_curr_key(state->cursor);
+        Newz(1234, oldkey, SEN_SYM_MAX_KEY_SIZE, void);
+
+        sen_records_curr_key(state->cursor, oldkey, SEN_SYM_MAX_KEY_SIZE);
         sen_records_rewind(state->cursor);
 
-        while (next = (void *) sen_records_next(state->cursor)) {
+        Newz(1234, key, SEN_SYM_MAX_KEY_SIZE, void);
+        while (sen_records_next(state->cursor, key, SEN_SYM_MAX_KEY_SIZE, &score)) {
             dSP;
 
             ENTER;
@@ -604,12 +597,12 @@ as_list(self)
              * to change the SV created here
              */
             if (state->key_size == SEN_INT_KEY) {
-                XPUSHs(sv_2mortal(newSViv(*((int *)next))));
+                XPUSHs(sv_2mortal(newSViv(*((int *)key))));
             } else {
-                XPUSHs(sv_2mortal(newSVpv((char *) next, strlen((char *) next))));
+                XPUSHs(sv_2mortal(newSVpv((char *) key, strlen((char *) key))));
             }
             XPUSHs(sv_2mortal(newSVpv("score", 5)));
-            XPUSHs(sv_2mortal(newSVuv(sen_records_curr_score(state->cursor))));
+            XPUSHs(sv_2mortal(newSVuv(score)));
             PUTBACK;
             if (call_method("Senna::Result::new", G_SCALAR) <= 0) {
                 croak ("Senna::Result::new did not return object");
@@ -629,10 +622,22 @@ as_list(self)
             av_push(list, sv);
         }
 
-        for (sen_records_rewind(state->cursor);
-            oldkey != sen_records_curr_key(state->cursor);
-            sen_records_next(state->cursor))
-            ; /* no op */
+        sen_records_rewind(state->cursor);
+
+        if (strlen(oldkey)) {
+            sen_records_curr_key(state->cursor, key, SEN_SYM_MAX_KEY_SIZE);
+            if (state->key_size == SEN_INT_KEY) {
+                do {
+                    if (*((int *) key) == *((int *) oldkey))
+                        break;
+                } while (sen_records_next(state->cursor, key, SEN_SYM_MAX_KEY_SIZE, &score));
+            } else {
+                do {
+                    if (strEQ(key, oldkey))
+                        break;
+                } while (sen_records_next(state->cursor, key, SEN_SYM_MAX_KEY_SIZE, &score));
+            }
+        }
 
         if (GIMME_V == G_ARRAY) {
             EXTEND(SP, av_len(list) + 1);
@@ -641,6 +646,9 @@ as_list(self)
         } else {
             XPUSHs(newRV_noinc((SV *) list));
         }
+
+        Safefree(key);
+        Safefree(oldkey);
 
 SV *
 hits(self)
@@ -666,6 +674,7 @@ next(self)
         SV *sv;
         STRLEN len;
         void *next;
+        int   score;
         SENNA_CURSOR_STATE *state;
     CODE:
         dSP;
@@ -679,7 +688,8 @@ next(self)
         if (state->cursor == NULL)
             XSRETURN_UNDEF;
 
-        next = (void *) sen_records_next(state->cursor);
+        Newz(1234, next, SEN_SYM_MAX_KEY_SIZE, void);
+        sen_records_next(state->cursor, next, SEN_SYM_MAX_KEY_SIZE, &score);
         if (next == NULL)
             XSRETURN_UNDEF;
 
@@ -698,7 +708,7 @@ next(self)
             XPUSHs(sv_2mortal(newSVpv((char *) next, strlen((char *) next))));
         }
         XPUSHs(sv_2mortal(newSVpv("score", 5)));
-        XPUSHs(sv_2mortal(newSVuv(sen_records_curr_score(state->cursor))));
+        XPUSHs(sv_2mortal(newSVuv(score)));
         PUTBACK;
         if (call_method("Senna::Result::new", G_SCALAR) <= 0) {
             croak ("Senna::Result::new did not return a proper object");
@@ -714,6 +724,8 @@ next(self)
         SPAGAIN;
         FREETMPS;
         LEAVE;
+
+        Safefree(next);
     
         RETVAL = sv;
     OUTPUT:
@@ -781,6 +793,7 @@ currkey(self)
         char *char_key;
         int  *int_key;
         SENNA_CURSOR_STATE *state;
+        void *key;
     CODE:
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
@@ -789,16 +802,14 @@ currkey(self)
         if (state->cursor == NULL)
             XSRETURN_UNDEF;
 
+        Newz(1234, key, SEN_SYM_MAX_KEY_SIZE, void);
+        if (! sen_records_curr_key(state->cursor, key, SEN_SYM_MAX_KEY_SIZE))
+            XSRETURN_UNDEF;
+
         if (state->key_size == SEN_INT_KEY) {
-            int_key = (int *) sen_records_curr_key(state->cursor);
-            if (int_key == NULL)
-                croak("sen_records_curr_key() returned NULL!");
-            RETVAL = newSViv(*int_key);
+            RETVAL = newSViv(*((int *) key));
         } else {
-            char_key = (char *) sen_records_curr_key(state->cursor) ;
-            if (char_key == NULL)
-                croak("sen_records_curr_key() returned NULL!");
-            RETVAL = newSVpv(char_key, strlen(char_key));
+            RETVAL = newSVpv((char *) key, strlen((char *) key));
         }
     OUTPUT:
         RETVAL

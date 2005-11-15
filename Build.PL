@@ -1,5 +1,5 @@
 #!perl
-# $Id: Build.PL 38 2005-08-05 04:27:58Z daisuke $
+# $Id: Build.PL 40 2005-11-15 09:14:44Z daisuke $
 #
 # Copyright (c) 2005 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -33,8 +33,29 @@ my %args = (
 my $class = Module::Build->subclass(code => <<'EOSUB');
     sub ACTION_build {
         my $self = shift;
-        unlink 'lib/Senna.c' if -f 'lib/Senna.c';
+
+        my $copy_mtime = (stat('lib/Senna.xs'))[9];
+        my $orig_mtime = (stat('Senna.xs'))[9];
+        if (defined $copy_mtime && $copy_mtime <= $orig_mtime) {
+            unlink 'lib/Senna.c' if -f 'lib/Senna.c';
+        }
         $self->SUPER::ACTION_build(@_);
+    }
+
+    sub ACTION_disttest
+    {
+        my $self = shift;
+        local $ENV{PERL_TESTPOD} = 1;
+        $self->SUPER::ACTION_disttest(@_);
+    }
+
+    sub find_test_files
+    {
+        my $self  = shift;
+        my $tests = $self->SUPER::find_test_files(@_);
+
+        return $tests if $ENV{PERL_TESTPOD};
+        return [ grep { $_ !~ /\bpod.*\.t\z/ } @$tests ];
     }
 EOSUB
 my $build = $class->new(%args);

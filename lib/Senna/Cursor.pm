@@ -1,4 +1,4 @@
-# $Id: Cursor.pm 35 2005-07-25 02:02:35Z daisuke $
+# $Id: Cursor.pm 40 2005-11-15 09:14:44Z daisuke $
 #
 # Daisuke Maki <dmak@cpan.org>
 # All rights reserved.
