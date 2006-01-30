@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.11 - 30 Jan 2006
+   - Adopt to recent senna, which changed the semantics of sen_records_next();
+   - Require Senna > 0.3.0 (warning: as of this writing, libsenna hasn't
+     updated it's version number -- but you can use anything above
+     revision number 73)
+
 0.10 - 15 Nov 2005
    - Only run POD tests for disttest
    - Require minimum version 0.3.0 for libsenna, due to some API changes

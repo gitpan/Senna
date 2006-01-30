@@ -1,6 +1,6 @@
 # $Id: Senna.pm 40 2005-11-15 09:14:44Z daisuke $
 #
-# Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 package Senna;
@@ -9,7 +9,7 @@ use vars qw($VERSION);
 
 BEGIN
 {
-    $VERSION = '0.10';
+    $VERSION = '0.11';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load('Senna', $VERSION);
@@ -23,6 +23,14 @@ BEGIN
 use Senna::Index;
 use Senna::Cursor;
 use Senna::Result;
+
+sub import
+{
+    my $class = shift;
+    if (@_) {
+        Senna::Index->export_to_level(1, $class, @_);
+    }
+}
 
 1;
 

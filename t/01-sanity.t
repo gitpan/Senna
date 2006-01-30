@@ -45,9 +45,12 @@ is($c->hits, 1, "should hit only 1 result");
 my @list = $c->as_list;
 is(scalar(@list), 1, "test as_list");
 
-my $r = $c->next;
-isa_ok($r, 'Senna::Result');
-is($r->key, $list[0]->key, "make sure next() returns the same thing as as_list()");
+my $idx = 0;
+while (my $r = $c->next) {
+    isa_ok($r, 'Senna::Result');
+    is($r->key, $list[$idx++]->key,
+        "make sure next() returns the same thing as as_list()");
+}
 ok($c->rewind);
 
 # now check when there are no hits

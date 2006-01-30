@@ -689,8 +689,7 @@ next(self)
             XSRETURN_UNDEF;
 
         Newz(1234, next, SEN_SYM_MAX_KEY_SIZE, void);
-        sen_records_next(state->cursor, next, SEN_SYM_MAX_KEY_SIZE, &score);
-        if (next == NULL)
+        if (!sen_records_next(state->cursor, next, SEN_SYM_MAX_KEY_SIZE, &score) || next == NULL)
             XSRETURN_UNDEF;
 
         ENTER;
