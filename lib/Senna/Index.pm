@@ -1,4 +1,4 @@
-# $Id: Index.pm 40 2005-11-15 09:14:44Z daisuke $
+# $Id: Index.pm 42 2006-04-02 12:29:52Z daisuke $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -23,6 +23,7 @@ BEGIN
             SEN_INDEX_SPLIT_DIGIT
             SEN_INDEX_SPLIT_SYMBOL
             SEN_INDEX_NGRAM
+            SEN_INDEX_DELIMITED
         ) ],
         encoding => [ qw(
             SEN_ENC_DEFAULT

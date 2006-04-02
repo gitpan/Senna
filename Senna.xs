@@ -1,4 +1,4 @@
-/* $Id: Senna.xs 40 2005-11-15 09:14:44Z daisuke $ 
+/* $Id: Senna.xs 42 2006-04-02 12:29:52Z daisuke $ 
  *
  * Daisuke Maki <dmaki@cpan.org> 
  * All rights reserved.
@@ -19,6 +19,7 @@
 #define SENNA_MAX_KEY_LEN 8192
 #define SEN_VARCHAR_KEY 0
 #define SEN_INT_KEY     4
+#define SENNA_MAX_N_EXPR 32
 
 #define XS_STATE(type, x) \
     INT2PTR(type, SvROK(x) ? SvIV(SvRV(x)) : SvIV(x))
@@ -42,11 +43,6 @@
         *(state->filename) = '\0'; \
  \
         sv = newSViv(PTR2IV(state)); \
-        sv_magic(sv, 0, '~', 0, 0); \
-        mg = mg_find(sv, '~'); \
-        assert(mg); \
-        mg->mg_virtual = &vtbl_free_SENNA_INDEX_STATE; \
- \
         sv = newRV_noinc(sv); \
         sv_bless(sv, gv_stashpv(SvPV_nolen(class), 1)); \
  \
@@ -68,7 +64,7 @@ struct psenna_cursor {
 typedef struct psenna_cursor SENNA_CURSOR_STATE;
 
 static void *
-sv2senna_key(SENNA_INDEX_STATE *state, SV *key)
+sv2senna_key(SENNA_INDEX_STATE *state, SV *key, void **ret_key)
 {
     long *int_key;
     long  int_tmp;
@@ -81,43 +77,16 @@ sv2senna_key(SENNA_INDEX_STATE *state, SV *key)
             croak("index is created with integer keys, but was passed a non-integer key");
         }
 
-        int_tmp = SvIVX(key);
-        int_key = &int_tmp;
-        return int_key;
+        int_tmp  = SvIV(key);
+        *ret_key = &int_tmp;
     } else {
         char_key = SvPV(key, len);
         if (len >= SENNA_MAX_KEY_LEN) {
             croak("key length must be less than SENNA_MAX_KEY_LEN bytes");
         }
-        return char_key;
+        *ret_key = (void *) char_key;
     }
 }
-
-static SV *
-put(SENNA_INDEX_STATE *state, void *key, char *value)
-{
-    sen_rc rc;
-
-    rc = sen_index_upd(state->index, (const void *)key,
-                                       NULL, (const char *) value);
-    return (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
-}
-
-static int
-magic_free_SENNA_INDEX_STATE(pTHX_ SV *sv, MAGIC *mg)
-{
-    return 1;
-}
-
-MGVTBL vtbl_free_SENNA_INDEX_STATE = { 0, 0, 0, 0, MEMBER_TO_FPTR(magic_free_SENNA_INDEX_STATE) };
-
-static int
-magic_free_SENNA_CURSOR_STATE(pTHX_ SV *sv, MAGIC *mg)
-{
-    return 1;
-}
-
-MGVTBL vtbl_free_SENNA_CURSOR_STATE = { 0, 0, 0, 0, MEMBER_TO_FPTR(magic_free_SENNA_CURSOR_STATE) };
 
 static void
 bootinit()
@@ -137,6 +106,7 @@ bootinit()
     newCONSTSUB(stash, "SEN_INDEX_SPLIT_DIGIT", newSViv(SEN_INDEX_SPLIT_DIGIT));
     newCONSTSUB(stash, "SEN_INDEX_SPLIT_SYMBOL", newSViv(SEN_INDEX_SPLIT_SYMBOL));
     newCONSTSUB(stash, "SEN_INDEX_NGRAM", newSViv(SEN_INDEX_NGRAM));
+    newCONSTSUB(stash, "SEN_INDEX_DELIMITED", newSViv(SEN_INDEX_DELIMITED));
     newCONSTSUB(stash, "SEN_ENC_DEFAULT", newSViv(sen_enc_default));
     newCONSTSUB(stash, "SEN_ENC_NONE", newSViv(sen_enc_none));
     newCONSTSUB(stash, "SEN_ENC_EUCJP", newSViv(sen_enc_euc_jp));
@@ -396,14 +366,16 @@ put(self, key, value)
         SENNA_INDEX_STATE *state;
         void *index_key;
         char *index_value;
-        STRLEN len;
         sen_rc rc;
     CODE:
+        if (! sv_isobject(self))
+            croak("put() must be called on an object");
+
         state = XS_STATE(SENNA_INDEX_STATE *, self);
         if (! SEN_INDEX_OK(state))
             croak("No index associated with Senna::Index");
 
-        index_key   = sv2senna_key(state, key);
+        sv2senna_key(state, key, &index_key);
         index_value = SvPV_nolen(value);
         rc = sen_index_upd(state->index, (const void *) index_key,
                                        NULL, (const char *) index_value);
@@ -421,15 +393,17 @@ del(self, key, value)
         SENNA_INDEX_STATE *state;
         void *index_key;
         char *index_value;
-        STRLEN len;
         sen_rc rc;
     CODE:
+        if (! sv_isobject(self))
+            croak("del() must be called on an object");
+
         state = XS_STATE(SENNA_INDEX_STATE *, self);
         if (! SEN_INDEX_OK(state))
             croak("No index associated with Senna::Index");
 
-        index_key   = sv2senna_key(state, key);
-        index_value = SvPV(value, len);
+        sv2senna_key(state, key, &index_key);
+        index_value = SvPV_nolen(value);
         rc = sen_index_upd(state->index, (const void *) index_key,
                                         (const char *) index_value, NULL);
         RETVAL = (rc == sen_success) ? &PL_sv_yes : &PL_sv_undef;
@@ -451,11 +425,14 @@ replace(self, key, old, new)
         char *new_value;
         sen_rc rc;
     CODE:
+        if (! sv_isobject(self))
+            croak("replace() must be called on an object");
+
         state = XS_STATE(SENNA_INDEX_STATE *, self);
         if (! SEN_INDEX_OK(state))
             croak("No index associated with Senna::Index");
 
-        key_value = sv2senna_key(state, key);
+        sv2senna_key(state, key, &key_value);
 
         old_value = SvPV(old, len);
         new_value = SvPV(new, len);
@@ -481,6 +458,9 @@ search(self, query)
         sen_records *result;
     CODE:
         dSP;
+
+        if (! sv_isobject(self))
+            croak("search() must be called on an object");
 
         state = XS_STATE(SENNA_INDEX_STATE *, self);
         if (! SEN_INDEX_OK(state))
@@ -545,10 +525,6 @@ new(class)
         state->key_size = -1;
 
         sv = newSViv(PTR2IV(state));
-        sv_magic(sv, 0, '~', 0, 0);
-        mg = mg_find(sv, '~');
-        assert(mg);
-        mg->mg_virtual = &vtbl_free_SENNA_CURSOR_STATE;
         sv = newRV_noinc(sv);
         sv_bless(sv, gv_stashpv(SvPV_nolen(class), 1));
         SvREADONLY_on(sv);
@@ -569,6 +545,9 @@ as_list(self)
         void *oldkey;
         int   idx;
     PPCODE:
+        if (! sv_isobject(self))
+            croak("as_list() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
             croak("Cursor not initialized!");
@@ -656,6 +635,9 @@ hits(self)
     PREINIT:
         SENNA_CURSOR_STATE *state;
     CODE:
+        if (! sv_isobject(self))
+            croak("hits() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state)) 
             croak("Cursor not initialized!");
@@ -678,6 +660,9 @@ next(self)
         SENNA_CURSOR_STATE *state;
     CODE:
         dSP;
+
+        if (! sv_isobject(self))
+            croak("next() must be called on an object");
 
         RETVAL = &PL_sv_undef;
 
@@ -738,6 +723,9 @@ rewind(self)
         SENNA_CURSOR_STATE *state;
         sen_rc rc;
     CODE:
+        if (! sv_isobject(self))
+            croak("rewind() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
             croak("Cursor not initialized!");
@@ -756,6 +744,9 @@ close(self)
         SENNA_CURSOR_STATE *state;
         sen_rc rc;
     CODE:
+        if (! sv_isobject(self))
+            croak("close() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
             croak("Cursor not initialized!");
@@ -774,6 +765,9 @@ score(self)
     PREINIT:
         SENNA_CURSOR_STATE *state;
     CODE:
+        if (! sv_isobject(self))
+            croak("score() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
             croak("Cursor not initialized!");
@@ -794,6 +788,9 @@ currkey(self)
         SENNA_CURSOR_STATE *state;
         void *key;
     CODE:
+        if (! sv_isobject(self))
+            croak("currkey() must be called on an object");
+
         state = XS_STATE(SENNA_CURSOR_STATE *, self);
         if (! SEN_CURSOR_OK(state))
             croak("Cursor not initialized!");

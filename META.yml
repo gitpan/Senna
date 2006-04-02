@@ -1,6 +1,6 @@
 ---
 name: Senna
-version: 0.11
+version: 0.12
 author:
   - 'Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>'
 abstract: Perl Interface To Senna Fulltext Search Engine
@@ -8,7 +8,7 @@ license: lgpl
 provides:
   Senna:
     file: lib/Senna.pm
-    version: 0.11
+    version: 0.12
   Senna::Cursor:
     file: lib/Senna/Cursor.pm
     version: 0.01
@@ -17,4 +17,4 @@ provides:
     version: 0.03
   Senna::Result:
     file: lib/Senna/Result.pm
-generated_by: Module::Build version 0.2611
+generated_by: Module::Build version 0.2612

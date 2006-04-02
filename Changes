@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.12 - 02 Apr 2006
+   - Fix how sv2senna_key() works. Previous versions of senna didn't quite
+     check for errornous keys, but it brought out some bugs. 
+     (This module was tested against rev 109)
+   - Cleanup some of the C code
+   - Partially apply patch from http://nomadscafe.jp/tmp/Senna-0.11.patch.
+
 0.11 - 30 Jan 2006
    - Adopt to recent senna, which changed the semantics of sen_records_next();
    - Require Senna > 0.3.0 (warning: as of this writing, libsenna hasn't
