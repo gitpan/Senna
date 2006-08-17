@@ -1,6 +1,28 @@
 Changes
 =======
 
+0.50_01 - 18 Aug 2006
+   * WARNING! This release breaks backward compatibility! *
+   - Revamp API to match that of libsenna 0.8.0.
+   - Bump up version to 0.50 to make it clear we're doing something new.
+   - We no longer support libsenna versions prior to 0.8.0.
+   - Constants are now located at Senna::Constants
+   - Deprecated
+      Senna::Cursor
+      Senna::Result
+   - Add new modules:
+      Senna::Constants
+      Senna::OptArg::Select
+      Senna::OptArg::Sort
+      Senna::Query
+      Senna::RC
+      Senna::Records
+      Senna::Record
+      Senna::Set
+      Senna::Snippet
+      Senna::Sym
+      Senna::Values
+
 0.12 - 02 Apr 2006
    - Fix how sv2senna_key() works. Previous versions of senna didn't quite
      check for errornous keys, but it brought out some bugs. 

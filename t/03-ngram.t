@@ -1,30 +1,54 @@
 #!perl
 #
-# $Id: 03-ngram.t 32 2005-06-24 00:38:36Z daisuke $
+# $Id: /mirror/Senna-Perl/t/03-ngram.t 2735 2006-08-17T18:39:40.937191Z daisuke  $
 #
-# Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 use strict;
-use Test::More qw(no_plan); #(tests => 5);
-use File::Spec;
+use Test::More (tests => 14);
+use File::Temp;
 
 BEGIN
 {
-    use_ok("Senna::Index", ':all');
+    use_ok("Senna");
+    use_ok("Senna::Constants", ":all");
 }
 
-my $index_name = 'test-ngram.db';
-my $path       = File::Spec->catfile('t', $index_name);
-my $index      = Senna::Index->create($path, SEN_VARCHAR_KEY, SEN_INDEX_NGRAM);
-my ($r, $c);
+my $temp = File::Temp->new(UNLINK => 1);
 
-ok($index, 'create()');
+my $index = Senna::Index->create(
+    path => $temp->filename,
+    flags => SEN_INDEX_NGRAM,
+);
 
-$r = $index->put("file1", "まずは日本語の値");
-#ok($r, 'put()');
+ok($index, 'check index');
+is($index->path, $temp->filename, "check path");
 
-$c = $index->search("日本語");
+my $rc = $index->insert(key => "file1", value => "まずは日本語の値");
+is($rc, SEN_RC_SUCCESS, "insert value returned $rc");
+is($index->nrecords_keys, 1, "1 record available");
+
+my $r = $index->select(query => "日本語");
+ok($r);
+isa_ok($r, "Senna::Records");
+is($r->nhits, 1);
+
+while (my $result = $r->next) {
+    is($result->key, "file1", "check key for \$r");
+}
+
+$r = $index->select(query => "本語");
+ok($r);
+isa_ok($r, "Senna::Records");
+is($r->nhits, 1);
+
+while (my $result = $r->next) {
+    is($result->key, "file1", "check key for \$r");
+}
+
+
+__END__
 ok($c, 'search() 1');
 is($c->hits, 1, 'hits() 1');
 

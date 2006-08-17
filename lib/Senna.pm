@@ -1,4 +1,4 @@
-# $Id: Senna.pm 43 2006-04-02 12:32:47Z daisuke $
+# $Id: /mirror/Senna-Perl/lib/Senna.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
 #
 # Copyright (c) Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -9,10 +9,10 @@ use vars qw($VERSION);
 
 BEGIN
 {
-    $VERSION = '0.12';
+    $VERSION = '0.50';
     if ($] > 5.006) {
         require XSLoader;
-        XSLoader::load('Senna', $VERSION);
+        XSLoader::load(__PACKAGE__, $VERSION);
     } else {
         require DynaLoader;
         @Senna::ISA = ('DynaLoader');
@@ -20,17 +20,16 @@ BEGIN
     }
 }
 
+use Senna::Constants;
 use Senna::Index;
-use Senna::Cursor;
-use Senna::Result;
-
-sub import
-{
-    my $class = shift;
-    if (@_) {
-        Senna::Index->export_to_level(1, $class, @_);
-    }
-}
+use Senna::OptArg::Select;
+use Senna::Query;
+use Senna::Record;
+use Senna::Records;
+use Senna::RC;
+use Senna::Snippet;
+use Senna::Symbol;
+use Senna::Values;
 
 1;
 
@@ -43,18 +42,25 @@ Senna - Perl Interface To Senna Fulltext Search Engine
 =head1 SYNOPSIS
 
   use Senna;
-  my $index = Senna::Index->create(...);
-  # or $index = Senna::Index->open(...);
-  #
-  my $cursor = $index->search($query);
 
-  while (my $key = $cursor->next) {
-      print $key, " score = ", $cursor->score, "\n";
-  }
+=head1 DESCRIPTION
+
+Senna is a fast, embeddable search engine that allows fulltext search
+capabilities (http://qwik.jp/senna).
+
+Please note that version 0.50 and upwards breaks compatibility with previous
+versions of this module, and only supported libsenna 0.8.0+.
+
+Below is a list of modules. Please refer to the documentation on each page
+for more comprehensive usage.
+
+=head2 L<Senna::Index|Senna::Index>
+
+=head2 L<Senna::RC|Senna::RC>
 
 =head1 AUTHOR
 
-Copyright (C) 2005 by Daisuke Maki <dmaki@cpan.org>
+Copyright (C) 2005-2006 by Daisuke Maki <dmaki@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,
@@ -64,6 +70,6 @@ Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
 
 =head1 SEE ALSO
 
-http://dev.razil.jp/project/senna - Senna Development Homepage
+http://qwik.jp/senna - Senna Development Homepage
 
 =cut

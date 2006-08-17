@@ -1,11 +1,45 @@
-#!perl
+# $Id: /mirror/Senna-Perl/t/01-sanity.t 2494 2006-07-12T19:39:43.608096Z daisuke  $
 #
-# $Id: 01-sanity.t 41 2006-01-30 09:38:21Z daisuke $
-#
-# Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 use strict;
+use Test::More (tests => 10);
+
+BEGIN
+{
+    use_ok("Senna");
+}
+
+{
+    # Test API
+    my %api = (
+        'Senna::Index' => [
+            qw(create open close remove rename select update path query_exec) ],
+        'Senna::OptArg::Select' => [
+            qw(new mode similarity_threshold max_interval weight_vector func func_arg) ],
+        'Senna::Query' => [ qw(open rest) ],
+        'Senna::Record' => [ qw(new key score) ],
+        'Senna::Records' => [
+            qw(next find rewind nhits curr_score curr_key close),
+            qw( union subtract intersect difference) ],
+        'Senna::Snippet' => [ qw(open close add_cond exec) ],
+        'Senna::Symbol' => [ qw(create open close get at del size key next pocket_set pocket_get prefix_search suffix_search common_prefix_search) ],
+        'Senna::Values' => [ qw(new open close add) ],
+    );
+
+    foreach my $package (sort keys %api) {
+        my $api = $api{$package};
+        can_ok($package, @$api);
+    }
+}
+
+ok(&Senna::Constants::LIBSENNA_VERSION, sprintf("libsenna version = %s",
+    &Senna::Constants::LIBSENNA_VERSION));
+
+1;
+
+__END__
 use Test::More (tests => 46);
 use File::Spec;
 
