@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.50_02 - 20 Aug 2006
+   - Fix silly typo bug in Senna::Index->open (fix by yappo)
+   - Fix other silly typos
+   - Fix Makefile.PL (to certain extent).
+     For some reason I can no longer compile with the default setup,
+     and so I need to perform ugly hacks, such as copying "typemap" and
+     "Senna.xs" to different locations. Should you need to re-compile
+     this module after running Makefile.PL once, make sure to re-run
+     Makefile.PL to make sure things work
+
 0.50_01 - 18 Aug 2006
    * WARNING! This release breaks backward compatibility! *
    - Revamp API to match that of libsenna 0.8.0.

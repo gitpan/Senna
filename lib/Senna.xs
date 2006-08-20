@@ -1,4 +1,4 @@
-/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2737 2006-08-17T19:01:38.146522Z daisuke  $
+/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2791 2006-08-20T08:38:51.896974Z daisuke  $
  *
  * Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
  * All rights reserved.
@@ -843,7 +843,7 @@ SRecords_curr_score(self)
         sen_records *r;
     CODE:
         r = XS_STATE(sen_records *, self);
-        RETVAL = sen_records_currkey(r);
+        RETVAL = sen_records_curr_score(r);
     OUTPUT:
         RETVAL
 
@@ -1217,7 +1217,7 @@ SSymbol_xs_next(self, id)
         sen_sym *sym;
     CODE:
         sym = XS_STATE(sen_sym *, self);
-        RETVAL = sen_sym_nex(sym, id);
+        RETVAL = sen_sym_next(sym, id);
     OUTPUT:
         RETVAL
 

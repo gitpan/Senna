@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Index.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Index.pm 2790 2006-08-20T07:14:47.871012Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -42,7 +42,7 @@ sub open
     my $class = shift;
     my %args  = @_;
 
-    $class->xs_create($args{path});
+    $class->xs_open($args{path});
 }
 
 sub rename

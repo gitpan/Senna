@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/Makefile.PL 2725 2006-08-17T05:41:38.060980Z daisuke  $
+# $Id: /mirror/Senna-Perl/Makefile.PL 2791 2006-08-20T08:38:51.896974Z daisuke  $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -50,14 +50,17 @@ my $config = do "tools/prompt.pl";
 
 my($major, $minor, $micro) = split(/\./, $config->{version});
 
+link('typemap', 'lib/typemap');
+link('lib/Senna.xs', 'Senna.xs');
+
 my %INFO = (
     ABSTRACT     => 'Interface to Senna search engine',
     AUTHOR       => 'Daisuke Maki <dmaki@cpan.org>',
     NAME         => 'Senna',
     VERSION_FROM => 'lib/Senna.pm',
     OBJECT       => '$(O_FILES)',
-    LIBS         => [ split(/\s+/, $config->{libs}) ],
-    INC          => $config->{cflags},
+    LIBS         => [ $config->{libs} ],
+    INC          => $config->{cflags} . " -Isrc",
     DEFINE       => join(" ",
         "-DSENNA_MAJOR_VERSION=$major",
         "-DSENNA_MINOR_VERSION=$minor",
