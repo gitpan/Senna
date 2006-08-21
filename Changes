@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.50_03 - 21 Aug 2006
+   - Fix selected usage of sen_record_info() to use sen_sym_info()
+   - Fix silly reversed if-else condition
+   - Add tests
+
 0.50_02 - 20 Aug 2006
    - Fix silly typo bug in Senna::Index->open (fix by yappo)
    - Fix other silly typos

@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/Makefile.PL 2791 2006-08-20T08:38:51.896974Z daisuke  $
+# $Id: /mirror/Senna-Perl/Makefile.PL 2793 2006-08-20T09:35:32.413465Z daisuke  $
 #
 # Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -66,7 +66,10 @@ my %INFO = (
         "-DSENNA_MINOR_VERSION=$minor",
         "-DSENNA_MICRO_VERSION=$micro",
         "-DSENNA_VERSION=$config->{version}"
-    )
+    ),
+    clean        => {
+        FILES => "lib/typemap Senna.xs"
+    },
 );
 $INFO{OPTIMIZE} = '-g' if $debugging;
 

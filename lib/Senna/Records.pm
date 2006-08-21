@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Records.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Records.pm 2794 2006-08-21T01:00:25.021535Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-Senna::Records - Wrapper For sen_records Data Type
+Senna::Records - Wrapper for sen_records Data Type
 
 =head1 METHODS
 

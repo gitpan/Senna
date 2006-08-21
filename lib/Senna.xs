@@ -1,4 +1,4 @@
-/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2791 2006-08-20T08:38:51.896974Z daisuke  $
+/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2794 2006-08-21T01:00:25.021535Z daisuke  $
  *
  * Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
  * All rights reserved.
@@ -6,7 +6,6 @@
 
 /* TODO
  *
- * - Silence stupid uninitialized value warnings
  * - Add more tests
  *
  */
@@ -25,7 +24,12 @@
 #define SEN_SYM_MAX_KEY_LENGTH 0xffff
 #endif
 
-#define SEN_INT_KEY 1
+/* XXX - 
+ * I can never get this straight.
+ * Senna's key_size element, even if you set it to 0 at creation time,
+ * returns the actual length of the key.
+ */
+#define SEN_INT_KEY sizeof(int)
 #define SEN_VARCHAR_KEY 0
 #define SEN_MAX_KEY_SIZE 8192
 #define SEN_MAX_PATH_SIZE 1024
@@ -214,8 +218,8 @@ sen_sort_optarg_cb(sen_records *r1, const sen_recordh *a,
 
     cb_args = (AV *) compar_args[1];
 
-    sen_record_info(r1, a, NULL, 0, &key_size, NULL, NULL, NULL, NULL);
-    if (key_size == SEN_INT_KEY) {
+    sen_sym_info(r1->keys, &key_size, NULL, NULL, NULL, NULL);
+    if (key_size == SEN_VARCHAR_KEY) {
         char key[SEN_MAX_KEY_SIZE];
         sen_record_info(r1, a, key, SEN_MAX_KEY_SIZE, NULL, 
             &section, &pos, &score, &n_subrecs);
@@ -248,6 +252,7 @@ sen_sort_optarg_cb(sen_records *r1, const sen_recordh *a,
             croak ("Senna::Record::new did not return a proper object");
         }
 
+        
         sen_record_info(r2, b, key, SEN_MAX_KEY_SIZE, NULL, 
             &section, &pos, &score, &n_subrecs);
 
@@ -278,7 +283,6 @@ sen_sort_optarg_cb(sen_records *r1, const sen_recordh *a,
         if (! sv_isobject(sv) || ! sv_isa(sv, "Senna::Record")) {
             croak ("Senna::Record::new did not return a proper object");
         }
-
     } else {
         long key;
         sen_record_info(r1, a, (void *) &key, SEN_INT_KEY, NULL, 
@@ -774,9 +778,13 @@ SRecords_xs_next(self)
         r = XS_STATE(sen_records *, self);
 
         if (GIMME_V == G_SCALAR) {
+            /* If we're being called in scalar context, then just return if
+             * we have a next record or not
+             */
             rc = sen_records_next(r, NULL, 0, NULL);
             XPUSHs(rc == 0 ? &PL_sv_no : &PL_sv_yes);
         } else {
+            /* Otherwise, grab the next entry along with other metadata */
             SV *key_sv;
             int score = 0;
             int key_size = 0;
@@ -784,18 +792,9 @@ SRecords_xs_next(self)
             int pos = 0;
             int n_subrecs = 0;
 
-            sen_record_info(r, sen_records_curr_rec(r), NULL, 0, &key_size,
-                NULL, NULL, NULL, NULL);
+            sen_sym_info(r->keys, &key_size, NULL, NULL, NULL, NULL);
 
-            if (key_size == SEN_VARCHAR_KEY) {
-                char key[SEN_MAX_KEY_SIZE];
-
-                rc = sen_records_next(r, &key, SEN_MAX_KEY_SIZE, &score);
-                sen_record_info(r, sen_records_curr_rec(r),
-                    NULL, 0, NULL,
-                    &section, &pos, NULL, &n_subrecs);
-                key_sv = newSVpv(key, 0);
-            } else {
+            if (key_size == SEN_INT_KEY) {
                 long key;
 
                 rc = sen_records_next(r, &key, 0, &score);
@@ -803,6 +802,14 @@ SRecords_xs_next(self)
                     NULL, 0, NULL,
                     &section, &pos, NULL, &n_subrecs);
                 key_sv = newSViv(key);
+            } else {
+                char key[SEN_MAX_KEY_SIZE];
+
+                rc = sen_records_next(r, &key, SEN_MAX_KEY_SIZE, &score);
+                sen_record_info(r, sen_records_curr_rec(r),
+                    NULL, 0, NULL,
+                    &section, &pos, NULL, &n_subrecs);
+                key_sv = newSVpv(key, 0);
             }
 
             if (rc != 0) {
