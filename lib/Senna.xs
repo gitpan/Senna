@@ -1,4 +1,4 @@
-/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2794 2006-08-21T01:00:25.021535Z daisuke  $
+/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2828 2006-08-23T15:19:48.003995Z daisuke  $
  *
  * Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
  * All rights reserved.
@@ -24,6 +24,11 @@
 #define SEN_SYM_MAX_KEY_LENGTH 0xffff
 #endif
 
+/* This is defined in senna's snip.h. */
+#ifndef MAX_SNIP_RESULT_COUNT
+#define MAX_SNIP_RESULT_COUNT 8U
+#endif
+
 /* XXX - 
  * I can never get this straight.
  * Senna's key_size element, even if you set it to 0 at creation time,
@@ -42,6 +47,14 @@
     sv = newRV_noinc(sv); \
     sv_bless(sv, gv_stashpv(class, 1)); \
     SvREADONLY_on(sv);
+
+typedef struct sen_perl_snip {
+    sen_snip *snip; /* the snip object */
+    char     **open_tags;
+    size_t    open_tags_size;
+    char     **close_tags;
+    size_t    close_tags_size;
+} sen_perl_snip;
 
 SV *
 sen_rc2obj(sen_rc rc)
@@ -1280,53 +1293,104 @@ SSet_info(self)
 MODULE = Senna      PACKAGE = Senna::Snippet   PREFIX=SSnip_
 
 SV *
-SSnip_xs_create(class, encoding, flags, width, max_results, defaultopentag, defaultclosetag, mapping)
+SSnip_xs_open(class, encoding, flags, width, max_results, default_open_tag_sv, default_close_tag_sv, mapping_sv)
         char*        class;
         sen_encoding encoding;
         int          flags;
         size_t       width;
         unsigned int max_results;
-        char*        defaultopentag;
-        char*        defaultclosetag;
-        int          mapping;
+        SV*          default_open_tag_sv;
+        SV*          default_close_tag_sv;
+        SV*          mapping_sv;
     PREINIT:
+        int mapping;
         sen_snip *snip;
+        sen_perl_snip *perl_snip;
+        char *default_open_tag = NULL;
+        char *default_close_tag = NULL;
+        STRLEN default_open_tag_len = 0;
+        STRLEN default_close_tag_len = 0;
         SV *sv;
     CODE:
+        if (max_results > MAX_SNIP_RESULT_COUNT) 
+            croak("Senna::Snippet::new(): max_results exceeds MAX_SNIP_RESULT_COUNT (%d)", MAX_SNIP_RESULT_COUNT);
+
+        if (SvPOK(default_open_tag_sv) && sv_len(default_open_tag_sv))
+            default_open_tag = SvPV(default_open_tag_sv, default_open_tag_len);
+
+        if (SvPOK(default_close_tag_sv) && sv_len(default_close_tag_sv))
+            default_close_tag = SvPV(default_close_tag_sv, default_close_tag_len);
+
+        mapping = SvTRUE(mapping_sv) ? -1 : 0;
+
+        Newz(1234, perl_snip, 1, sen_perl_snip);
+
+        if (default_open_tag == NULL)
+            croak("Senna::Snippet::new(): default_open_tag must be specified");
+
+        if (default_close_tag == NULL)
+            croak("Senna::Snippet::new(): default_close_tag must be specified");
+
+
+        perl_snip->open_tags_size = 1;
+        Newz(1234, perl_snip->open_tags, 1, char *);
+        Newz(1234, perl_snip->open_tags[perl_snip->open_tags_size - 1], default_open_tag_len + 1, char);
+        Copy(default_open_tag, perl_snip->open_tags[perl_snip->open_tags_size - 1], default_open_tag_len, char);
+        default_open_tag = perl_snip->open_tags[perl_snip->open_tags_size - 1];
+
+        perl_snip->close_tags_size = 1;
+        Newz(1234, perl_snip->close_tags, 1, char *);
+        Newz(1234, (perl_snip->close_tags[perl_snip->close_tags_size - 1]), default_close_tag_len + 1, char);
+        Copy(default_close_tag, perl_snip->close_tags[0], default_close_tag_len, char);
+        default_close_tag = perl_snip->close_tags[perl_snip->close_tags_size - 1];
+
         /* mapping is written as a struct, but the docs say that you should
          * specify NULL or -1
          */
-        snip = sen_snip_open(encoding, flags, width, max_results, defaultopentag, defaultclosetag, mapping ? (sen_snip_mapping *) mapping : NULL);
+        snip = sen_snip_open(encoding, flags, width, max_results, default_open_tag, default_close_tag, (sen_snip_mapping *) mapping);
         if (snip == NULL)
             croak("Failed to create snip");
 
-        XS_STRUCT2OBJ(sv, class, snip);
+        perl_snip->snip = snip;
+
+        XS_STRUCT2OBJ(sv, class, perl_snip);
         RETVAL = sv;
     OUTPUT:
         RETVAL
 
 SV *
-SSnip_close(self)
-        SV *self;
-    PREINIT:
-        sen_snip *snip;
-    CODE:
-        snip = XS_STATE(sen_snip *, self);
-        RETVAL = sen_rc2obj(sen_snip_close(snip));
-    OUTPUT:
-        RETVAL
-
-SV *
-SSnip_xs_add_cond(self, keyword, opentag, closetag)
+SSnip_xs_add_cond(self, keyword, opentag_sv, closetag_sv)
         SV *self;
         char *keyword;
-        char *opentag;
-        char *closetag;
+        SV *opentag_sv;
+        SV *closetag_sv;
     PREINIT:
-        sen_snip *snip;
+        char *opentag = NULL;
+        char *closetag = NULL;
+        sen_perl_snip *snip;
+        STRLEN len;
     CODE:
-        snip = XS_STATE(sen_snip *, self);
-        RETVAL = sen_rc2obj(sen_snip_add_cond(snip, keyword, opentag, closetag));
+        snip = XS_STATE(sen_perl_snip *, self);
+
+        if (SvPOK(opentag_sv) && sv_len(opentag_sv) > 0) {
+            opentag = SvPV(opentag_sv, len);
+            snip->open_tags_size++;
+            Renew(snip->open_tags, snip->open_tags_size, char *);
+            Newz(1234, snip->open_tags[snip->open_tags_size - 1], len + 1, char);
+            Copy(opentag, snip->open_tags[snip->open_tags_size - 1], len, char);
+            opentag = snip->open_tags[snip->open_tags_size - 1];
+        }
+            
+        if (SvPOK(closetag_sv) && sv_len(closetag_sv) > 0) {
+            closetag = SvPV(closetag_sv, len);
+            snip->close_tags_size++;
+            Renew(snip->close_tags, snip->close_tags_size, char *);
+            Newz(1234, snip->close_tags[snip->close_tags_size - 1], len + 1, char);
+            Copy(closetag, snip->close_tags[snip->close_tags_size - 1], len, char);
+            closetag = snip->close_tags[snip->close_tags_size - 1];
+        }
+            
+        RETVAL = sen_rc2obj(sen_snip_add_cond(snip->snip, keyword, opentag, closetag));
     OUTPUT:
         RETVAL
 
@@ -1335,28 +1399,48 @@ SSnip_xs_exec(self, string)
         SV *self;
         char *string;
     PREINIT:
-        sen_snip    *snip;
+        sen_perl_snip    *snip;
         unsigned int nresults;
+        char        *result;
         size_t       max_tagged_len;
+        int          i;
+        sen_rc rc;
     PPCODE:
-        snip = XS_STATE(sen_snip *, self);
-        sen_snip_exec(snip, string, &nresults, &max_tagged_len);
-        EXTEND(SP, 2);
-        PUSHs(sv_2mortal(newSViv(nresults)));
-        PUSHs(sv_2mortal(newSViv(max_tagged_len)));
+        snip = XS_STATE(sen_perl_snip *, self);
+        sen_snip_exec(snip->snip, string, &nresults, &max_tagged_len);
 
-char *
-SSnip_xs_get_result(self, index)
+        EXTEND(SP, nresults);
+        Newz(1234, result, max_tagged_len, char);
+        for(i = 0; i < nresults; i++) {
+            rc = sen_snip_get_result(snip->snip, i, result);
+            if (rc != sen_success) 
+                croak("Call to sen_snip_get_result returned %d", rc);
+            PUSHs(sv_2mortal(newSVpv(result, 0)));
+        }
+        Safefree(result);
+
+void
+DESTROY(self)
         SV *self;
-        unsigned int index;
     PREINIT:
-        sen_snip *snip;
-        char *result;
-    CODE:
-        sen_snip_get_result(snip, index, result);
-        RETVAL = result;
-    OUTPUT:
-        RETVAL
+        sen_perl_snip *snip;
+        int i;
+    PPCODE:
+        snip = XS_STATE(sen_perl_snip *, self);
+        sen_snip_close(snip->snip);
+
+        for(i = 0; i < snip->open_tags_size; i++) {
+            Safefree(snip->open_tags[i]);
+        }
+        Safefree(snip->open_tags);
+
+        for(i = 0; i < snip->close_tags_size; i++) {
+            Safefree(snip->close_tags[i]);
+        }
+        Safefree(snip->close_tags);
+
+        
+
 
 MODULE = Senna      PACKAGE = Senna::OptArg::Sort  PREFIX=SOSort_
 

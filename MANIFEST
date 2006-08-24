@@ -22,6 +22,8 @@ t/01-sanity.t
 t/02-index.t
 t/03-ngram.t
 t/04-morph.t
+t/05-records.t
+t/06-snippet.t
 t/99-pod-coverage.t
 t/99-pod.t
 tools/prompt.pl

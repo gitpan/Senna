@@ -23,7 +23,7 @@ BEGIN
         'Senna::Records' => [
             qw(next find rewind nhits curr_score curr_key close),
             qw( union subtract intersect difference) ],
-        'Senna::Snippet' => [ qw(open close add_cond exec) ],
+        'Senna::Snippet' => [ qw(new add_cond exec) ],
         'Senna::Symbol' => [ qw(create open close get at del size key next pocket_set pocket_get prefix_search suffix_search common_prefix_search) ],
         'Senna::Values' => [ qw(new open close add) ],
     );

@@ -1,31 +1,43 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Snippet.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Snippet.pm 2828 2006-08-23T15:19:48.003995Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 package Senna::Snippet;
 use strict;
+use Senna;
 
 *new = \&open;
 sub open
 {
     my $class = shift;
     my %args  = @_;
-    $class->xs_open(@args{qw(encoding flags width max_results defaultopentag defaultclosetag mapping)});
- 
+
+    $args{default_open_tag} ||= '{';
+    $args{default_close_tag} ||= '}';
+    $args{width} ||= 200;
+    $args{max_results} ||= 3;
+    $args{flags} ||= 0;
+    if (! exists $args{mapping}) { $args{mapping} = -1 }
+
+    $class->xs_open(@args{qw(encoding flags width max_results default_open_tag default_close_tag mapping)});
 }
 
 sub add_cond
 {
     my $self = shift;
     my %args = @_;
-    $self->xs_add_cond(@args{qw(keyword opentag closetag)});
+
+    $args{keyword} || die "keyword must be specified";
+
+    $self->xs_add_cond(@args{qw(keyword open_tag close_tag)});
 }
 
 sub exec
 {
     my $self = shift;
     my %args = @_;
+
     $self->xs_exec(@args{qw(string)});
 }
 
@@ -37,13 +49,41 @@ __END__
 
 Senna::Snippet - Wrapper Around sen_snip
 
+=head1 SYNOPSIS
+
+  use Senna::Constants qw(SEN_ENC_EUCJP);
+  use Senna::Snippet;
+
+  my $snip = Senna::Snippet->new(
+    encoding    => SEN_ENC_EUCJP,
+    width       => 100, # width of snippet
+    max_results => 10, # max number of results returned on exec()
+    default_open_tag => '<b>', # default '{'
+    default_close_tag => '</b>'
+  );
+
+  $snip->add_cond(key => "poop", open_tag => "<s>", close_tag => "</s>");
+  $snip->add_cond(...);
+
+  my @text = $snip->exec( string => $text_to_be_snipped );
+
+=head1 DESCRIPTION
+
+Senna::Snippet allows you to extract out terms within a text, much like
+how Google and other seaarch engines hilight the queried text in the
+search result.
+
 =head1 METHODS
 
 =head2 new
+
 =head2 open
+
+Alias to new().
+
 =head2 add_cond
+
 =head2 exec
-=head2 close
 
 =head1 AUTHOR
 

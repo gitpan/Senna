@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna.pm 2828 2006-08-23T15:19:48.003995Z daisuke  $
 #
 # Copyright (c) Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -46,7 +46,7 @@ Senna - Perl Interface To Senna Fulltext Search Engine
 =head1 DESCRIPTION
 
 Senna is a fast, embeddable search engine that allows fulltext search
-capabilities (http://qwik.jp/senna).
+capabilities (http://qwik.jp/senna). 
 
 Please note that version 0.50 and upwards breaks compatibility with previous
 versions of this module, and only supported libsenna 0.8.0+.
@@ -56,7 +56,27 @@ for more comprehensive usage.
 
 =head2 L<Senna::Index|Senna::Index>
 
+=head2 L<Senna::Constants|Senna::Constants>
+
 =head2 L<Senna::RC|Senna::RC>
+
+=head2 L<Senna::Records|Senna::Records>
+
+=head2 L<Senna::Record|Senna::Record>
+
+=head2 L<Senna::Query|Senna::Query>
+
+=head2 L<Senna::Set|Senna::Set>
+
+=head2 L<Senna::Symbol|Senna::Symbol>
+
+=head2 L<Senna::Snippet|Senna::Snippet>
+
+=head2 L<Senna::Values|Senna::Values>
+
+=head2 L<Senna::OptArg::Select|Senna::OptArg::Select>
+
+=head2 L<Senna::OptArg::Sort|Senna::OptArg::Sort>
 
 =head1 AUTHOR
 
