@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.50 - 27 Aug 2006
+   - Release 0.50
+   - No code change from 0.50_04.
+
 0.50_04 - 24 Aug 2006
    - Add missing test file
    - Revamp Senna::Snippet API. Look ma, it works!

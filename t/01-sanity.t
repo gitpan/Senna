@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/t/01-sanity.t 2494 2006-07-12T19:39:43.608096Z daisuke  $
+# $Id: /mirror/Senna-Perl/t/01-sanity.t 2830 2006-08-24T02:53:18.040683Z daisuke  $
 #
 # Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.

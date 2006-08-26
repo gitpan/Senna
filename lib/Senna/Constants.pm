@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Constants.pm 2490 2006-07-12T18:03:01.935546Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Constants.pm 2862 2006-08-26T15:08:36.484922Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -106,71 +106,156 @@ __END__
 
 =head1 NAME
 
-Senna::Constants - Constat Values In libsenna
+Senna::Constants - Constant Values In libsenna
+
+=head1 SYNOPSIS
+
+  use Senna::Constants qw(
+    :key_size
+    :flags
+    :encoding
+    :query
+    :rc
+    :rec_unit
+    :sel_op
+    :sel_mode
+    :sort
+    :log
+  );
+
+  use Senna::Constants qw(:all);
+
+=head1 DESCRIPTION
+
+Senna:::Constants gives you access to the various constant values defined in
+libsenna. 
 
 =head1 CONSTANTS
 
 =head2 LIBSENNA_VERSION
+
+This constant is not exported.
+
 =head2 SEN_VARCHAR_KEY
+
 =head2 SEN_INT_KEY
+
 =head2 SEN_INDEX_NORMALIZE
+
 =head2 SEN_INDEX_SPLIT_ALPHA
+
 =head2 SEN_INDEX_SPLIT_DIGIT
+
 =head2 SEN_INDEX_SPLIT_SYMBOL
+
 =head2 SEN_INDEX_MORPH_ANALYSE
+
 =head2 SEN_INDEX_NGRAM
+
 =head2 SEN_INDEX_DELIMITED
+
 =head2 SEN_INDEX_ENABLE_PREFIX_SEARCH
+
 =head2 SEN_INDEX_ENABLE_SUFFIX_SEARCH
+
 =head2 SEN_INDEX_DISABLE_SUFFIX_SEARCH
+
 =head2 SEN_INDEX_WITH_VACUUM
+
 =head2 SEN_ENC_DEFAULT
+
 =head2 SEN_ENC_NONE
+
 =head2 SEN_ENC_EUCJP
+
 =head2 SEN_ENC_UTF8
+
 =head2 SEN_ENC_SJIS
+
 =head2 SEN_QUERY_ADJ_DEC
+
 =head2 SEN_QUERY_ADJ_INC
+
 =head2 SEN_QUERY_ADJ_NEG
+
 =head2 SEN_QUERY_AND
+
 =head2 SEN_QUERY_BUT
+
 =head2 SEN_QUERY_PARENL
+
 =head2 SEN_QUERY_PARENR
+
 =head2 SEN_QUERY_PREFIX
+
 =head2 SEN_QUERY_QUOTEL
+
 =head2 SEN_QUERY_QUOTER
+
 =head2 SEN_RC_SUCCESS
+
 =head2 SEN_RC_MEMORY_EXHAUSTED
+
 =head2 SEN_RC_INVALID_FORMAT
+
 =head2 SEN_RC_FILE_ERR
+
 =head2 SEN_RC_INVALID_ARG
+
 =head2 SEN_RC_OTHER
+
 =head2 SEN_REC_DOCUMENT
+
 =head2 SEN_REC_SECTION
+
 =head2 SEN_REC_POSITION
+
 =head2 SEN_REC_USERDEF
+
 =head2 SEN_REC_NONE
+
 =head2 SEN_SELOP_OR
+
 =head2 SEN_SELOP_AND
+
 =head2 SEN_SELOP_BUT
+
 =head2 SEN_SELOP_ADJUST
+
 =head2 SEN_SELMODE_EXACT
+
 =head2 SEN_SELMODE_PARTIAL
+
 =head2 SEN_SELMODE_UNSPLIT
+
 =head2 SEN_SELMODE_NEAR
+
 =head2 SEN_SELMODE_SIMILAR
+
 =head2 SEN_SELMODE_TERM_EXTRACT
+
 =head2 SEN_SORT_ASC
+
 =head2 SEN_SORT_DESC
+
 =head2 SEN_LOG_NONE
+
 =head2 SEN_LOG_EMERG
+
 =head2 SEN_LOG_ALERT
+
 =head2 SEN_LOG_CRIT
+
 =head2 SEN_LOG_ERROR
+
 =head2 SEN_LOG_WARNING
+
 =head2 SEN_LOG_NOTICE
+
 =head2 SEN_LOG_INFO
+
 =head2 SEN_LOG_DEBUG
+
 =head2 SEN_LOG_DUMP
 
 =cut

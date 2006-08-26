@@ -25,8 +25,11 @@ Senna::Set - Wrapper Around sen_set
 =head1 METHODS
 
 =head2 new
+
 =head2 open
+
 =head2 close
+
 =head2 info
 
 =head1 AUTHOR

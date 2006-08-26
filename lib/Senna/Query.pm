@@ -24,7 +24,9 @@ Senna::Query - Wrapper Around sen_query
 =head1 METHODS
 
 =head2 open
+
 =head2 close
+
 =head2 rest
 
 =head1 AUTHOR

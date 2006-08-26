@@ -49,7 +49,7 @@ Senna is a fast, embeddable search engine that allows fulltext search
 capabilities (http://qwik.jp/senna). 
 
 Please note that version 0.50 and upwards breaks compatibility with previous
-versions of this module, and only supported libsenna 0.8.0+.
+versions of this module, and only supports libsenna 0.8.0+. 
 
 Below is a list of modules. Please refer to the documentation on each page
 for more comprehensive usage.
@@ -77,6 +77,12 @@ for more comprehensive usage.
 =head2 L<Senna::OptArg::Select|Senna::OptArg::Select>
 
 =head2 L<Senna::OptArg::Sort|Senna::OptArg::Sort>
+
+=head1 CAVEATS
+
+Portions of this module that interact with the "Advanced API" from libsenna
+aren't too well tested. If you encounter any problems, please send me
+minimal test cases that displays the problem.
 
 =head1 AUTHOR
 

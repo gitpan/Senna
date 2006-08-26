@@ -34,6 +34,8 @@ Senna::RC - Wrapper for sen_rc
 =head1 SYNOPSIS
 
   use Senna::RC;
+  use Senna::Constants qw(SEN_SUCCESS);
+
   my $rc = Senna::RC->new(SEN_SUCCESS);
   if ($rc) {
      print "success!\n";

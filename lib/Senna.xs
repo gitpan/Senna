@@ -1,4 +1,4 @@
-/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2828 2006-08-23T15:19:48.003995Z daisuke  $
+/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2830 2006-08-24T02:53:18.040683Z daisuke  $
  *
  * Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
  * All rights reserved.

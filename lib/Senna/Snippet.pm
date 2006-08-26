@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Snippet.pm 2828 2006-08-23T15:19:48.003995Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Snippet.pm 2832 2006-08-24T05:08:04.287241Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -69,8 +69,8 @@ Senna::Snippet - Wrapper Around sen_snip
 
 =head1 DESCRIPTION
 
-Senna::Snippet allows you to extract out terms within a text, much like
-how Google and other seaarch engines hilight the queried text in the
+Senna::Snippet allows you to extract out KWIC text, much like
+how Google and other search engines hilight the queried text in the
 search result.
 
 =head1 METHODS
