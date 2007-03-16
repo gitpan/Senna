@@ -4,8 +4,9 @@ use strict;
 use File::Spec;
 
 my $interactive = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
-my($version, $cflags, $libs);
+my($version, $cflags, $libs, $tmp);
 
+=head1
 print 
     "******************************\n",
     "* WARNING! WARNING! WARNING! *\n",
@@ -16,11 +17,12 @@ print
     "\n",
     "Proceed ? [n] ";
 
-my $tmp = <STDIN>;
+$tmp = <STDIN>;
 chomp $tmp;
 if ($tmp !~ /^y(?:es)?$/) {
     exit 1;
 }
+=cut
 
 print "Probing for libsenna ...\n";
 

@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.51 - 17 Mar 2007
+   - More docs.
+   - Typo reported by Jun Kuriyama
+   - Work with Senna >= 1.0.0
+
 0.50 - 27 Aug 2006
    - Release 0.50
    - No code change from 0.50_04.

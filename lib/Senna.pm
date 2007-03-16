@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna.pm 2828 2006-08-23T15:19:48.003995Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna.pm 6103 2007-03-16T16:45:50.914799Z daisuke  $
 #
 # Copyright (c) Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -9,7 +9,7 @@ use vars qw($VERSION);
 
 BEGIN
 {
-    $VERSION = '0.50';
+    $VERSION = '0.51';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load(__PACKAGE__, $VERSION);

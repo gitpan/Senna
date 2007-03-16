@@ -1,6 +1,6 @@
-/* $Id: /mirror/Senna-Perl/lib/Senna.xs 2830 2006-08-24T02:53:18.040683Z daisuke  $
+/* $Id: /mirror/Senna-Perl/lib/Senna.xs 6103 2007-03-16T16:45:50.914799Z daisuke  $
  *
- * Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
+ * Copyright (c) 2005-2007 Daisuke Maki <dmaki@cpan.org>
  * All rights reserved.
  */
 
@@ -602,16 +602,21 @@ SIndex_xs_select(self, query_sv, records, op_sv, optarg_sv)
         SV *optarg_sv;
     PREINIT:
         SV *sv;
+        STRLEN query_len = 0;
         sen_index   *index;
         sen_rc       rc;
         sen_records *r;
         sen_select_optarg *optarg = NULL;
         sen_sel_operator op = SvOK(op_sv) ? SvIV(op_sv) : 0;
-        char *query = SvOK(query_sv) ? SvPV_nolen(query_sv) : NULL;
+        char *query = NULL;
         int need_optarg_free = 0;
         int need_records_free = 0;
     PPCODE:
         index = XS_STATE(sen_index *, self);
+
+        if ( SvOK(query_sv) ) {
+            query = SvPV(query_sv, query_len);
+        }
 
         if (! SvOK(records)) {
             r = sen_records_open(sen_rec_document, sen_rec_none, 0);
@@ -632,6 +637,9 @@ SIndex_xs_select(self, query_sv, records, op_sv, optarg_sv)
         rc = sen_index_select(
             index,
             query,
+#if (SENNA_MAJOR_VERSION >= 1)
+            query_len,
+#endif
             r,
             op,
             optarg
@@ -698,13 +706,34 @@ SIndex_xs_upd(self, key, old_sv, new_sv)
         sen_index *index;
         int        key_size;
         void      *void_key;
-        char      *old = SvOK(old_sv) ? SvPV_nolen(old_sv) : NULL;
-        char      *new = SvOK(new_sv) ? SvPV_nolen(new_sv) : NULL;
+        char      *old = NULL;
+        char      *new = NULL;
+        STRLEN old_len, new_len;
     CODE:
         index = XS_STATE(sen_index *, self);
         sv2senna_key(index, key, &void_key);
 
-        RETVAL = sen_rc2obj(sen_index_upd(index, void_key, old, new));
+        if ( SvOK(old_sv) ) {
+            old = SvPV(old_sv, old_len);
+        }
+
+        if ( SvOK(new_sv) ) {
+            new = SvPV(new_sv, new_len);
+        }
+
+        RETVAL = sen_rc2obj(sen_index_upd(
+            index,
+            void_key,
+            old,
+#if (SENNA_MAJOR_VERSION >= 1)
+            old_len,
+#endif
+            new,
+#if (SENNA_MAJOR_VERSION >= 1)
+            new_len
+#endif
+        ));
+
     OUTPUT:
         RETVAL
  
@@ -1019,7 +1048,15 @@ SQuery_xs_open(class, str, default_op, max_exprs, encoding)
         SV *sv;
         sen_query *q;
     CODE:
-        q = sen_query_open(str, default_op, max_exprs, encoding);
+        q = sen_query_open(
+            str, 
+#if (SENNA_MAJOR_VERSION >= 1)
+            strlen(str),
+#endif
+            default_op,
+            max_exprs,
+            encoding
+        );
         if (q == NULL)
             croak("Failed to open query");
 
@@ -1033,9 +1070,18 @@ SQuery_rest(self)
         SV *self;
     PREINIT:
         sen_query *q;
+#if (SENNA_MAJOR_VERSION >= 1)
+        char *rest;
+        unsigned int len;
+#endif
     CODE:
         q = XS_STATE(sen_query *, self);
+#if (SENNA_MAJOR_VERSION >= 1)
+        len = sen_query_rest(q, (const char**) &rest);
+        RETVAL = rest;
+#else
         RETVAL = (char *) sen_query_rest(q);
+#endif
     OUTPUT:
         RETVAL
 
@@ -1347,7 +1393,21 @@ SSnip_xs_open(class, encoding, flags, width, max_results, default_open_tag_sv, d
         /* mapping is written as a struct, but the docs say that you should
          * specify NULL or -1
          */
-        snip = sen_snip_open(encoding, flags, width, max_results, default_open_tag, default_close_tag, (sen_snip_mapping *) mapping);
+        snip = sen_snip_open(
+            encoding,
+            flags,
+            width,
+            max_results,
+            default_open_tag,
+#if (SENNA_MAJOR_VERSION >= 1)
+            default_open_tag_len,
+#endif
+            default_close_tag,
+#if (SENNA_MAJOR_VERSION >= 1)
+            default_close_tag_len,
+#endif
+            (sen_snip_mapping *) mapping
+        );
         if (snip == NULL)
             croak("Failed to create snip");
 
@@ -1368,29 +1428,47 @@ SSnip_xs_add_cond(self, keyword, opentag_sv, closetag_sv)
         char *opentag = NULL;
         char *closetag = NULL;
         sen_perl_snip *snip;
-        STRLEN len;
+        STRLEN opentag_len = 0;
+        STRLEN closetag_len = 0;
     CODE:
         snip = XS_STATE(sen_perl_snip *, self);
 
         if (SvPOK(opentag_sv) && sv_len(opentag_sv) > 0) {
-            opentag = SvPV(opentag_sv, len);
+            opentag = SvPV(opentag_sv, opentag_len);
             snip->open_tags_size++;
             Renew(snip->open_tags, snip->open_tags_size, char *);
-            Newz(1234, snip->open_tags[snip->open_tags_size - 1], len + 1, char);
-            Copy(opentag, snip->open_tags[snip->open_tags_size - 1], len, char);
+            Newz(1234, snip->open_tags[snip->open_tags_size - 1], opentag_len + 1, char);
+            Copy(opentag, snip->open_tags[snip->open_tags_size - 1], opentag_len, char);
             opentag = snip->open_tags[snip->open_tags_size - 1];
         }
             
         if (SvPOK(closetag_sv) && sv_len(closetag_sv) > 0) {
-            closetag = SvPV(closetag_sv, len);
+            closetag = SvPV(closetag_sv, closetag_len);
             snip->close_tags_size++;
             Renew(snip->close_tags, snip->close_tags_size, char *);
-            Newz(1234, snip->close_tags[snip->close_tags_size - 1], len + 1, char);
-            Copy(closetag, snip->close_tags[snip->close_tags_size - 1], len, char);
+            Newz(1234, snip->close_tags[snip->close_tags_size - 1], closetag_len + 1, char);
+            Copy(closetag, snip->close_tags[snip->close_tags_size - 1], closetag_len, char);
             closetag = snip->close_tags[snip->close_tags_size - 1];
         }
             
-        RETVAL = sen_rc2obj(sen_snip_add_cond(snip->snip, keyword, opentag, closetag));
+        RETVAL = sen_rc2obj(
+            sen_snip_add_cond(
+                snip->snip,
+                keyword,
+#if (SENNA_MAJOR_VERSION >= 1)
+                strlen(keyword),
+#endif
+                opentag,
+#if (SENNA_MAJOR_VERSION >= 1)
+                opentag_len,
+#endif
+                closetag
+#if (SENNA_MAJOR_VERSION >= 1)
+                ,
+                closetag_len
+#endif
+            )
+        );
     OUTPUT:
         RETVAL
 
@@ -1402,17 +1480,37 @@ SSnip_xs_exec(self, string)
         sen_perl_snip    *snip;
         unsigned int nresults;
         char        *result;
+#if (SENNA_MAJOR_VERSION >= 1)
+        unsigned int max_tagged_len;
+#else
         size_t       max_tagged_len;
+#endif
         int          i;
         sen_rc rc;
     PPCODE:
         snip = XS_STATE(sen_perl_snip *, self);
-        sen_snip_exec(snip->snip, string, &nresults, &max_tagged_len);
+        sen_snip_exec(
+            snip->snip,
+            string,
+#if (SENNA_MAJOR_VERSION >= 1)
+            strlen(string),
+#endif
+            &nresults,
+            &max_tagged_len
+        );
 
         EXTEND(SP, nresults);
         Newz(1234, result, max_tagged_len, char);
         for(i = 0; i < nresults; i++) {
-            rc = sen_snip_get_result(snip->snip, i, result);
+            rc = sen_snip_get_result(
+                snip->snip,
+                i,
+                result
+#if (SENNA_MAJOR_VERSION >= 1)
+                ,
+                &max_tagged_len
+#endif
+            );
             if (rc != sen_success) 
                 croak("Call to sen_snip_get_result returned %d", rc);
             PUSHs(sv_2mortal(newSVpv(result, 0)));
@@ -1791,7 +1889,16 @@ SValues_xs_add(self, str, weight)
         sen_values *values;
     CODE:
         values = XS_STATE(sen_values *, self);
-        RETVAL = sen_rc2obj(sen_values_add(values, str, weight));
+        RETVAL = sen_rc2obj(
+            sen_values_add(
+                values,
+                str,
+#if (SENNA_MAJOR_VERSION >= 1)
+                strlen(str),
+#endif
+                weight
+            )
+        );
     OUTPUT:
         RETVAL
 

@@ -1,4 +1,4 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Record.pm 2738 2006-08-17T19:02:18.939501Z daisuke  $
+# $Id: /mirror/Senna-Perl/lib/Senna/Record.pm 2879 2006-08-31T03:08:01.291533Z daisuke  $
 #
 # Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
@@ -70,7 +70,7 @@ Returns the key value of the search hit.
 
 =head2 score
 
-Returns the score of the search hist.
+Returns the score of the search hit.
 
 =head2 pos
 

@@ -1,44 +1,13 @@
----
-name: Senna
-version: 0.50
-author:
-  - 'Copyright (C) 2005-2006 by Daisuke Maki <dmaki@cpan.org>'
-abstract: Perl Interface To Senna Fulltext Search Engine
-license: lgpl
-resources:
-  license: http://opensource.org/licenses/artistic-license.php
-build_requires:
-  File::Spec: 0
-  File::Temp: 0
-provides:
-  Senna:
-    file: lib/Senna.pm
-    version: 0.50
-  Senna::Constants:
-    file: lib/Senna/Constants.pm
-  Senna::Index:
-    file: lib/Senna/Index.pm
-  Senna::OptArg::Select:
-    file: lib/Senna/OptArg/Select.pm
-  Senna::OptArg::Sort:
-    file: lib/Senna/OptArg/Sort.pm
-  Senna::Query:
-    file: lib/Senna/Query.pm
-  Senna::RC:
-    file: lib/Senna/RC.pm
-  Senna::Record:
-    file: lib/Senna/Record.pm
-  Senna::Records:
-    file: lib/Senna/Records.pm
-  Senna::Set:
-    file: lib/Senna/Set.pm
-  Senna::Snippet:
-    file: lib/Senna/Snippet.pm
-  Senna::Symbol:
-    file: lib/Senna/Symbol.pm
-  Senna::Values:
-    file: lib/Senna/Values.pm
-generated_by: Module::Build version 0.2805
+--- #YAML:1.0
+name:                Senna
+version:             0.51
+abstract:            Interface to Senna search engine
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Daisuke Maki <dmaki@cpan.org>
