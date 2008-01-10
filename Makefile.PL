@@ -1,9 +1,9 @@
-# $Id: /mirror/Senna-Perl/Makefile.PL 2793 2006-08-20T09:35:32.413465Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Senna/trunk/Makefile.PL 37675 2008-01-02T01:45:20.932525Z daisuke  $
 #
-# Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2005-2008 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
 use strict;
-use 5.006001;
+use 5.008;
 use ExtUtils::MakeMaker;
 
 my $interactive = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
@@ -49,15 +49,32 @@ for(my $i = 0; $i < @ARGV; $i++) {
 my $config = do "tools/prompt.pl";
 
 my($major, $minor, $micro) = split(/\./, $config->{version});
+# Oh the hackery... this code is fragile.
+my $n_version = $major + $minor / 100 + $micro / 100000;
+if ($n_version < 1.00009) {
+    print <<EOM;
+
+You have senna version $config->{version}
+
+Senna Perl binding requires at least senna version 1.0.9. Please install
+the appropriate version before proceeding.
+
+EOM
+    exit 1;
+}
 
 link('typemap', 'lib/typemap');
 link('lib/Senna.xs', 'Senna.xs');
 
 my %INFO = (
     ABSTRACT     => 'Interface to Senna search engine',
-    AUTHOR       => 'Daisuke Maki <dmaki@cpan.org>',
+    AUTHOR       => 'Daisuke Maki <daisuke@endeworks.jp>',
     NAME         => 'Senna',
     VERSION_FROM => 'lib/Senna.pm',
+    PREREQ_PM    => {
+        'Class::Accessor::Fast' => 0,
+        'Encode'                => 0,
+    },
     OBJECT       => '$(O_FILES)',
     LIBS         => [ $config->{libs} ],
     INC          => $config->{cflags} . " -Isrc",
@@ -70,6 +87,9 @@ my %INFO = (
     clean        => {
         FILES => "lib/typemap Senna.xs"
     },
+    test         => {
+        TESTS        => 't/*.t t/*/*.t'
+    }
 );
 $INFO{OPTIMIZE} = '-g' if $debugging;
 

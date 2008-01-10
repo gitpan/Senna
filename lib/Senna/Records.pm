@@ -1,29 +1,20 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Records.pm 2794 2006-08-21T01:00:25.021535Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Senna/trunk/lib/Senna/Records.pm 37742 2008-01-04T01:18:00.636616Z daisuke  $
 #
-# Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2005-2008 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
 
 package Senna::Records;
 use strict;
-
-*new = \&open;
-sub open
-{
-    my $class = shift;
-    my %args  = @_;
-    $class->xs_open(@args{qw(record_unit subrec_unit max_n_subrecs)});
-}
+use warnings;
 
 sub next
 {
     my $self = shift;
-    my @p = $self->xs_next();
-    if (@p) {
-        my %h;
-        @h{qw(key score section pos n_subrecs)} = @p;
-        return Senna::Record->new(%h);
+    my $record = $self->_XS_next;
+    if ($record && wantarray) {
+        return ($record->key, $record->score);
     }
-    return ();
+    return $record;
 }
 
 1;
@@ -32,33 +23,39 @@ __END__
 
 =head1 NAME
 
-Senna::Records - Wrapper for sen_records Data Type
+Senna::Records - A Collection Of Records (sen_records)
 
 =head1 METHODS
 
-=head2 new
 =head2 open
-=head2 next
+
 =head2 close
+
+=head2 next
+
 =head2 curr_key
-=head2 curr_score
+
 =head2 nhits
-=head2 find
-=head2 difference
-=head2 intersect
-=head2 subtract
-=head2 union
-=head2 rewind
 
-=head1 AUTHOR
+=head2 sort
 
-Copyright (C) 2005 - 2006 by Daisuke Maki <dmaki@cpan.org>
+Sorts the records, discarding results if the total number of records
+exceed C<limit>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+  $records->sort($limit);
 
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
+If you want to control the sort order (ascending/descending), specify a
+second argument which can be a HASHREF
+
+  $records->sort($limit, { mode => SEN_SORT_ASCENDING });
+  $records->sort($limit, { mode => SEN_SORT_DESCENDING });
+
+Beware, though, that according to the senna documentation, by specifying
+not sort options the results are sorted by I<score> (descending), and if you
+specify the mode (without any compar args), the results are sorted by the
+I<key>s.
+
+Please note that the custom comparison operator is currently not supported.
+Patched welcome!
 
 =cut
-

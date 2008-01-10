@@ -1,44 +1,54 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/Snippet.pm 2832 2006-08-24T05:08:04.287241Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Senna/trunk/lib/Senna/Snippet.pm 38386 2008-01-10T08:02:17.639836Z daisuke  $
 #
-# Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2005-2008 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
 
 package Senna::Snippet;
 use strict;
-use Senna;
+use warnings;
 
-*new = \&open;
 sub open
 {
     my $class = shift;
-    my %args  = @_;
+    if ($_[0] eq 'HASH') {
+        my $args = $_[0];
+        @_ = map { $args->{$_} } qw(encoding flags width max_results tags);
+    } else {
+        my %args = @_;
+        @_ = map { $args{$_} } qw(encoding flags width max_results tags);
+    }
 
-    $args{default_open_tag} ||= '{';
-    $args{default_close_tag} ||= '}';
-    $args{width} ||= 200;
-    $args{max_results} ||= 3;
-    $args{flags} ||= 0;
-    if (! exists $args{mapping}) { $args{mapping} = -1 }
-
-    $class->xs_open(@args{qw(encoding flags width max_results default_open_tag default_close_tag mapping)});
+    $class->_XS_open(@_);
 }
+
+*new = \&open;
 
 sub add_cond
 {
     my $self = shift;
-    my %args = @_;
+    if ($_[0] eq 'HASH') {
+        my $args = $_[0];
+        @_ = map { $args->{$_} } qw(keyword tags);
+    } else {
+        my %args = @_;
+        @_ = map { $args{$_} } qw(keyword tags);
+    }
 
-    $args{keyword} || die "keyword must be specified";
-
-    $self->xs_add_cond(@args{qw(keyword open_tag close_tag)});
+    $self->_XS_add_cond(@_);
 }
 
 sub exec
 {
     my $self = shift;
-    my %args = @_;
+    if ($_[0] eq 'HASH') {
+        my $args = $_[0];
+        @_ = map { $args->{$_} } qw(string);
+    } else {
+        my %args = @_;
+        @_ = map { $args{$_} } qw(string);
+    }
 
-    $self->xs_exec(@args{qw(string)});
+    $self->_XS_exec(@_);
 }
 
 1;
@@ -47,52 +57,39 @@ __END__
 
 =head1 NAME
 
-Senna::Snippet - Wrapper Around sen_snip
+Senna::Snippet - Wrapper for sen_snip
 
 =head1 SYNOPSIS
 
-  use Senna::Constants qw(SEN_ENC_EUCJP);
-  use Senna::Snippet;
+  my $snippet = Senna::Snippet->new({
+    encoding    => $encoding
+    flags       => $flags
+    width       => $width,
+    max_results => $max_results,
+    tags        => [ $opentag, $closetag ]
+  });
 
-  my $snip = Senna::Snippet->new(
-    encoding    => SEN_ENC_EUCJP,
-    width       => 100, # width of snippet
-    max_results => 10, # max number of results returned on exec()
-    default_open_tag => '<b>', # default '{'
-    default_close_tag => '</b>'
-  );
-
-  $snip->add_cond(key => "poop", open_tag => "<s>", close_tag => "</s>");
-  $snip->add_cond(...);
-
-  my @text = $snip->exec( string => $text_to_be_snipped );
-
-=head1 DESCRIPTION
-
-Senna::Snippet allows you to extract out KWIC text, much like
-how Google and other search engines hilight the queried text in the
-search result.
+  $snippet->exec({ string => $string });
+  while (my $snip = $snippet->next) {
+     ...
+  }
 
 =head1 METHODS
 
-=head2 new
-
-=head2 open
-
-Alias to new().
-
 =head2 add_cond
+
+=head2 close
 
 =head2 exec
 
-=head1 AUTHOR
+=head2 get_result
 
-Copyright (C) 2005 - 2006 by Daisuke Maki <dmaki@cpan.org>
+=head2 new
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+=head2 next
 
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
+=head2 open
+
+=head2 rewind
 
 =cut

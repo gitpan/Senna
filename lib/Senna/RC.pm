@@ -1,6 +1,6 @@
-# $Id: /mirror/Senna-Perl/lib/Senna/RC.pm 2879 2006-08-31T03:08:01.291533Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Senna/trunk/lib/Senna/RC.pm 37708 2008-01-02T14:49:19.475826Z daisuke  $
 #
-# Copyright (c) 2005-2006 Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2005-2008 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
 
 package Senna::RC;
@@ -68,15 +68,5 @@ Creates a new Senna::RC object
 =head2 value
 
 Returns the internal sen_rc value
-
-=head1 AUTHOR
-
-Copyright (C) 2005 - 2006 by Daisuke Maki <dmaki@cpan.org>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
-
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
 
 =cut

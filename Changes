@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.60000_01 - 10 Jan 2008
+ * Complete rewrite.
+     * Now only works with newer libsenna >= 1.0.9
+     * Various XS tunings.
+ * Deprecated getters for Senna::Index. These should now be accessed
+   via Senna::Index::Info, which is returned by using $index->info()
+ * Deprecated usage of $foo->method(%args). Everything should now be
+   called as $foo->method(\%args)
+ - Add Senna::Ctx and Senna::DB (Jiro Nishiguchi)
+
 0.51 - 17 Mar 2007
    - More docs.
    - Typo reported by Jun Kuriyama

@@ -1,35 +1,36 @@
-# $Id: /mirror/Senna-Perl/lib/Senna.pm 6103 2007-03-16T16:45:50.914799Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Senna/trunk/lib/Senna.pm 38387 2008-01-10T08:09:02.619819Z daisuke  $
 #
-# Copyright (c) Daisuke Maki <dmaki@cpan.org>
+# Copyright (c) 2005-2008 Daisuke Maki <daisuke@endeworks.jp>
 # All rights reserved.
 
 package Senna;
 use strict;
-use vars qw($VERSION);
+use warnings;
+use vars qw($VERSION @ISA);
+use 5.008;
+use XSLoader;
 
 BEGIN
 {
-    $VERSION = '0.51';
-    if ($] > 5.006) {
-        require XSLoader;
-        XSLoader::load(__PACKAGE__, $VERSION);
-    } else {
-        require DynaLoader;
-        @Senna::ISA = ('DynaLoader');
-        __PACKAGE__->bootstrap();
-    }
+    $VERSION = '0.60000';
+    XSLoader::load(__PACKAGE__, $VERSION);
 }
 
+END
+{
+    cleanup();
+}
+
+use Senna::DB;
 use Senna::Constants;
+use Senna::Ctx;
+use Senna::Encoding;
 use Senna::Index;
-use Senna::OptArg::Select;
 use Senna::Query;
-use Senna::Record;
-use Senna::Records;
 use Senna::RC;
 use Senna::Snippet;
 use Senna::Symbol;
-use Senna::Values;
+
 
 1;
 
@@ -37,65 +38,56 @@ __END__
 
 =head1 NAME
 
-Senna - Perl Interface To Senna Fulltext Search Engine
+Senna - Perl Binding for Senna Full Text Search Engine
 
 =head1 SYNOPSIS
 
   use Senna;
 
+  my $index = Senna::Index->create(
+    path => "...",
+  );
+  my $info = $index->info;
+
 =head1 DESCRIPTION
 
-Senna is a fast, embeddable search engine that allows fulltext search
-capabilities (http://qwik.jp/senna). 
+This module provides a Perl binding to libsenna, an embeddable full-text search
+engine.
 
-Please note that version 0.50 and upwards breaks compatibility with previous
-versions of this module, and only supports libsenna 0.8.0+. 
+While Senna remains a personal favorite to search for Japanese text, 
+Senna (the API) is in a constant state of flux which makes things really hard
+for binding development. This module tries hard to keep up with the changes,
+but if you see breakage, PATCHES ARE ENCOURAGED. Please see L<CODE|CODE>
 
-Below is a list of modules. Please refer to the documentation on each page
-for more comprehensive usage.
+=head1 METHODS
 
-=head2 L<Senna::Index|Senna::Index>
+=head2 info
 
-=head2 L<Senna::Constants|Senna::Constants>
+=head2 cleanup
 
-=head2 L<Senna::RC|Senna::RC>
+Performs C level cleanup for Senna. You do NOT need to use this method.
+It's called automatically at END block.
 
-=head2 L<Senna::Records|Senna::Records>
+=head1 CODE
 
-=head2 L<Senna::Record|Senna::Record>
+Senna is graciously hosted by coderepos (http://coderepos.org/share)
+For latest version, please grab from:
 
-=head2 L<Senna::Query|Senna::Query>
-
-=head2 L<Senna::Set|Senna::Set>
-
-=head2 L<Senna::Symbol|Senna::Symbol>
-
-=head2 L<Senna::Snippet|Senna::Snippet>
-
-=head2 L<Senna::Values|Senna::Values>
-
-=head2 L<Senna::OptArg::Select|Senna::OptArg::Select>
-
-=head2 L<Senna::OptArg::Sort|Senna::OptArg::Sort>
-
-=head1 CAVEATS
-
-Portions of this module that interact with the "Advanced API" from libsenna
-aren't too well tested. If you encounter any problems, please send me
-minimal test cases that displays the problem.
+  http://svn.coderepos.org/share/lang/perl/Senna/trunk
 
 =head1 AUTHOR
 
-Copyright (C) 2005-2006 by Daisuke Maki <dmaki@cpan.org>
+Copyright (c) 2005-2008 Daisuke Maki E<lt>daisuke@endeworks.jpE<gt>
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+=head1 CONTRIBUTORS
 
-Development funded by Brazil Ltd. E<lt>http://dev.razil.jp/project/senna/E<gt>
+Jiro Nishiguchi
 
-=head1 SEE ALSO
+=head1 LICENSE
 
-http://qwik.jp/senna - Senna Development Homepage
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
 
 =cut

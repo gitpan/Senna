@@ -1,28 +1,8 @@
-#!perl
-# $Id$
 use strict;
 use File::Spec;
 
 my $interactive = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
 my($version, $cflags, $libs, $tmp);
-
-=head1
-print 
-    "******************************\n",
-    "* WARNING! WARNING! WARNING! *\n",
-    "******************************\n",
-    "\n",
-    "This version of Senna.pm breaks compatibility with the previous versions.\n",
-    "You are STRONGLY advised to audit your applications prior to upgrading.\n",
-    "\n",
-    "Proceed ? [n] ";
-
-$tmp = <STDIN>;
-chomp $tmp;
-if ($tmp !~ /^y(?:es)?$/) {
-    exit 1;
-}
-=cut
 
 print "Probing for libsenna ...\n";
 
